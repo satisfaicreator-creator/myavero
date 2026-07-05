@@ -42,7 +42,7 @@ Commit the whole `/app` folder. Both `vercel.json` files are ready.
 4. Click Deploy (will fail first time on missing env — expected).
 
 ## Step 5 — Add Environment Variables in Vercel
-Settings → Environment Variables → add these **7 vars** (apply to Production + Preview + Development):
+Settings → Environment Variables → add these **8 vars** (apply to Production + Preview + Development):
 
 | Key | Example | Where from |
 |---|---|---|
@@ -84,7 +84,6 @@ Vercel → Settings → Domains → add `theavero.dev` → set DNS → SSL auto-
 ## When to upgrade (only if you outgrow free tier)
 - **Vercel Pro ($20/mo)** — if chatbot streams hit the 10-second timeout OR bandwidth exceeds 100 GB.
 - **Resend Pro ($20/mo)** — if you send >3,000 emails/month.
-- **Upgrade to real AI chatbot** — add `OPENAI_API_KEY` env var later; a 5-line code swap enables OpenAI streaming for genuinely conversational replies (~$5/month covers 30k chat replies).
 
 ---
 
