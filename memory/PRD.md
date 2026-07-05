@@ -1,41 +1,47 @@
 # Avero — PRD
 
 ## Original problem statement
-Build a complete, production-ready, ultra-modern website for Avero, a premium web design & development company. Tagline "We Design. You Grow." Promise 48-hour website delivery, starting ₹2,999. Dark futuristic neon-tech theme. Convert visitors into WhatsApp / call / form / booking leads.
+Build a complete, production-ready, ultra-modern website for Avero, a premium web design & development company. Tagline "We Design. You Grow." 48-hour delivery, starting ₹2,999. Dark futuristic neon-tech theme. Convert visitors into WhatsApp / call / form leads. Position Avero as a modern IT studio expanding into AI marketing, AI ads, model fine-tuning and trainings.
 
-## Approved architecture (2026-07-05)
-- React 19 (CRA + craco) + Tailwind + shadcn/ui + Framer Motion (hybrid CSS 3D scene, not full Three.js — user pick)
+## Approved architecture
+- React 19 (CRA + craco) + Tailwind + shadcn/ui + Framer Motion (hybrid CSS 3D scene)
 - FastAPI + MongoDB (Motor)
 - Emergent Universal LLM key (OpenAI `gpt-4o-mini`) for AI chatbot (SSE streaming)
-- Resend for lead email notifications to satisfaicreator@gmail.com
+- Resend for lead email notifications
 - JWT-secured admin dashboard
 
 ## User personas
-- Local business owner (salon, cafe, CA, wholesale) needing a quick, trustworthy website
-- Startup founder needing premium 3D-tier brand website
+- Local business owner (salon, cafe, CA, wholesale) needing a trustworthy website — English or Hindi
+- Startup founder needing premium 3D brand website
 - Ecommerce brand needing product/catalogue site
-- Avero admin (satisfaicreator@gmail.com) managing enquiries
+- Avero admin managing enquiries
 
 ## Core requirements (static)
-- Contact form must always create a MongoDB record even if email fails.
-- Chatbot must run on Emergent LLM key with a system prompt encoding Avero facts.
-- Portfolio labelled as "Live Demo Concepts" — never as clients.
-- Never promise guaranteed #1 SEO ranking.
+- Contact form always creates MongoDB record (email is fire-and-forget)
+- Chatbot on Emergent LLM key with Avero-specific system prompt
+- Portfolio labelled as "Live Demo Concepts", never as clients
+- No promise of #1 SEO ranking
+- Blog is idempotently seeded on backend startup
+- i18n falls through to English if Hindi key missing
 
-## What's been implemented — 2026-07-05
-- Landing page (announcement bar marquee, sticky glass header, 3D-style hero with animated headline, before/after problem, 12 services, 48-hour delivery timeline, 4 portfolio demo cards, 3D showcase, 14 industries, 3 pricing tiers, 12 why-Avero, before/after summary, lead-gen dashboard visual, AI section, contact form with 11 fields, FAQ, footer, sticky mobile CTA bar)
-- Live AI chatbot (bottom-right widget) with SSE streaming
-- Admin login + dashboard with stats + status transitions
-- Resend email on enquiry submission (async / non-blocking)
-- Auto-seeded admin from env vars
-- SEO meta + JSON-LD ProfessionalService structured data
-- Passes both backend and frontend testing agent (100% success rate)
+## Implemented — 2026-07-05 → 2026-07-06
+### Iteration 1
+Landing (16 sections), AI chatbot (SSE), Admin login/dashboard, Resend emails, SEO meta + basic JSON-LD.
 
-## Backlog / next tasks
-- P1: Verified custom sender email (SENDER_EMAIL) via Resend domain verification for higher deliverability
-- P1: Portfolio card real screenshots (currently gradient placeholders)
-- P2: Blog / case study section
-- P2: Ecommerce package sub-page for detailed product-website features
-- P2: Multi-language (Hindi) toggle for local business owners
-- P3: Testimonials once real client permissions received
-- P3: Rate limiting on /api/enquiries and /api/chat
+### Iteration 2
+Hero "Coming Soon" strip with rotating AI stack, viral MemeSection (before/after slider + SVG characters), Laptop3D (3 content tabs), Roadmap section, single ₹2,999 Mega Offer, portfolio real screenshots (mshots), positioning to "modern IT studio".
+
+### Iteration 3 (current)
+- **Blog / Case Studies**: `/blog`, `/blog/:slug`, landing preview section, 4 seeded case studies with body_html + mshots covers.
+- **Hindi language toggle**: `EN/HI` in header + mobile drawer. Persists in localStorage, respects `?lang=hi` query. Translates hero + nav + coming-soon strip + blog headers.
+- **Complete SEO**: robots.txt, sitemap.xml, canonical, hreflang (en/hi/x-default), OG/Twitter tags, 5 JSON-LD blocks on landing (Organization / WebSite / ProfessionalService+Offer / FAQPage / BreadcrumbList) + Article JSON-LD per blog post.
+
+Testing: 3/3 iterations at 100% backend + 100% frontend.
+
+## Backlog
+- P1: Verify sender domain in Resend for high deliverability
+- P2: Real client testimonials (once permissions received)
+- P2: One-click WhatsApp follow-up template button in admin dashboard
+- P2: Rate limiting on `/api/enquiries` and `/api/chat`
+- P3: Split server.py into routers/ (blog, admin, chat)
+- P3: react-helmet-async for cleaner meta management
