@@ -126,6 +126,37 @@ export default function Landing() {
         { "@type": "Question", "name": "Can you build a 3D website?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — we create interactive Three.js sites, 3D product sections, scroll animations and cinematic landing pages." } }
       ]
     });
+    injectJsonLd("avero-jsonld-localbusiness", {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "@id": "https://theavero.dev/#localbusiness",
+      "name": "Avero",
+      "image": "https://theavero.dev/og-cover.jpg",
+      "url": "https://theavero.dev",
+      "telephone": "+91-9680816234",
+      "email": "satisfaicreator@gmail.com",
+      "priceRange": "₹₹",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "IN",
+        "addressRegion": "Rajasthan",
+        "addressLocality": "Jaipur"
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "India" },
+        { "@type": "City", "name": "Jaipur" },
+        { "@type": "City", "name": "Delhi" },
+        { "@type": "City", "name": "Mumbai" },
+        { "@type": "City", "name": "Bengaluru" }
+      ],
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "09:00",
+        "closes": "20:00"
+      }],
+      "sameAs": []
+    });
     injectJsonLd("avero-jsonld-breadcrumb", {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",

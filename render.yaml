@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: avero-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: avero_prod
+      - key: CORS_ORIGINS
+        value: "https://theavero.dev,https://www.theavero.dev"
+      - key: EMERGENT_LLM_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        value: onboarding@resend.dev
+      - key: ADMIN_RECIPIENT_EMAIL
+        value: satisfaicreator@gmail.com
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@theavero.dev
+      - key: ADMIN_PASSWORD
+        sync: false
