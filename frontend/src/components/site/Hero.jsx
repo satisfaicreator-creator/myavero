@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { AVERO } from "@/lib/config";
 import HeroScene from "./HeroScene";
+import ComingSoonStrip from "./ComingSoonStrip";
 
 const rotating = ["Grow", "Convert", "Rank", "Impress", "Sell", "Scale"];
 
@@ -73,6 +74,8 @@ export default function Hero() {
             <br />
             Your Business
           </motion.h1>
+
+          <ComingSoonStrip />
 
           <motion.p
             initial={{ opacity: 0, y: 12 }}

@@ -114,10 +114,12 @@ function Laptop({ active, onClick }) {
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Laptop lid + screen */}
-          <button
-            type="button"
+          <div
+            role="button"
+            tabIndex={0}
             onClick={onClick}
-            className="block w-full text-left glass-strong rounded-[18px] overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(124,58,237,0.6)]"
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
+            className="block w-full text-left glass-strong rounded-[18px] overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(124,58,237,0.6)] cursor-pointer"
             data-testid="laptop3d-screen"
           >
             {/* Bezel top */}
@@ -145,7 +147,7 @@ function Laptop({ active, onClick }) {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </button>
+          </div>
           {/* Laptop base */}
           <div className="mx-auto -mt-1 w-[104%] -ml-[2%] h-4 rounded-b-2xl bg-gradient-to-b from-[#111327] to-[#05061a] border border-white/10 shadow-2xl" />
           <div className="mx-auto w-[30%] h-1 rounded-b-full bg-white/10 mt-[-1px]" />
