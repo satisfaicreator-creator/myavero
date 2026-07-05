@@ -234,7 +234,7 @@ async def chat_stream(body: ChatIn):
         api_key=EMERGENT_LLM_KEY,
         session_id=session_id,
         system_message=AVERO_SYSTEM_PROMPT,
-    ).with_model("openai", "gpt-5.4-mini")
+    ).with_model("openai", "gpt-4o-mini")
 
     async def event_gen():
         collected = []
