@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import AnnouncementBar from "@/components/site/AnnouncementBar";
 import Header from "@/components/site/Header";
 import Hero from "@/components/site/Hero";
+import MemeSection from "@/components/site/MemeSection";
 import ProblemSection from "@/components/site/ProblemSection";
 import Services from "@/components/site/Services";
+import Laptop3D from "@/components/site/Laptop3D";
 import Delivery from "@/components/site/Delivery";
 import Portfolio from "@/components/site/Portfolio";
 import ThreeDShowcase from "@/components/site/ThreeDShowcase";
@@ -13,6 +15,7 @@ import WhyAvero from "@/components/site/WhyAvero";
 import BeforeAfter from "@/components/site/BeforeAfter";
 import LeadGen from "@/components/site/LeadGen";
 import AISection from "@/components/site/AISection";
+import Roadmap from "@/components/site/Roadmap";
 import ContactForm from "@/components/site/ContactForm";
 import FAQ from "@/components/site/FAQ";
 import Footer from "@/components/site/Footer";
@@ -27,8 +30,8 @@ export default function Landing() {
       if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
       el.setAttribute("content", content);
     };
-    setMeta("description", "Avero builds modern, secure, SEO-ready websites with 48-hour delivery, premium UI/UX, domain, hosting, maintenance, lead generation forms and AI chatbot integration.");
-    setMeta("keywords", "website development India, business website, 48 hour website delivery, SEO website, AI chatbot website, domain hosting website, premium website design, Avero, theavero.dev");
+    setMeta("description", "Avero is a modern IT studio delivering premium AI-powered websites in 48 hours (starting ₹2,999) — with AI marketing, advertising, model fine-tuning and trainings on the roadmap.");
+    setMeta("keywords", "website development India, business website, 48 hour website delivery, AI chatbot website, AI marketing agency, AI advertisement, model fine-tuning, IT solutions India, premium website design, Avero, theavero.dev");
 
     // Structured data
     const sd = {
@@ -72,8 +75,10 @@ export default function Landing() {
       <Header />
       <main>
         <Hero />
+        <MemeSection />
         <ProblemSection />
         <Services />
+        <Laptop3D />
         <Delivery />
         <Portfolio />
         <ThreeDShowcase />
@@ -83,6 +88,7 @@ export default function Landing() {
         <BeforeAfter />
         <LeadGen />
         <AISection />
+        <Roadmap />
         <ContactForm />
         <FAQ />
       </main>

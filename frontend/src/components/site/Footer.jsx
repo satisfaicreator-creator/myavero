@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="lg:col-span-5">
             <AveroLogo />
             <p className="text-white/60 mt-5 max-w-md">
-              Avero builds modern websites, AI-powered experiences and digital presence for growing businesses.
+              Avero is a modern IT studio — starting with premium AI-powered websites today, and expanding into AI marketing, advertising, model fine-tuning and trainings tomorrow.
             </p>
             <div className="mt-6 flex gap-2">
               {[Instagram, Twitter, Linkedin, Facebook].map((I, i) => (

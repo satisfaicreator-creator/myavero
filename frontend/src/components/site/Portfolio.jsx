@@ -7,7 +7,7 @@ const demos = [
     title: "Premium Tea & Wholesale Website Concept",
     desc: "A warm, elegant wholesale product website with catalogue, enquiry form, sample request, reviews and location CTAs.",
     href: "https://kuber-enterprise-tea.vercel.app/",
-    gradient: "from-amber-500/25 via-orange-500/20 to-red-500/20",
+    shot: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fkuber-enterprise-tea.vercel.app%2F?w=1024&h=640",
     accent: "text-amber-300",
   },
   {
@@ -15,7 +15,7 @@ const demos = [
     title: "Beauty Salon & Academy Website Concept",
     desc: "Premium beauty website for bridal makeup, salon services, academy enquiries, gallery, appointments and WhatsApp booking.",
     href: "https://makeup-by-harshita-jaipur.vercel.app/",
-    gradient: "from-pink-500/25 via-fuchsia-500/20 to-rose-500/20",
+    shot: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fmakeup-by-harshita-jaipur.vercel.app%2F?w=1024&h=640",
     accent: "text-fuchsia-300",
   },
   {
@@ -23,7 +23,7 @@ const demos = [
     title: "Finance & Compliance Workflow Website Concept",
     desc: "Modern finance workflow website with service sections, tax calculator, enquiry forms, compliance visuals and business trust UI.",
     href: "https://vk-associates.vercel.app/",
-    gradient: "from-blue-500/25 via-indigo-500/20 to-purple-500/20",
+    shot: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Fvk-associates.vercel.app%2F?w=1024&h=640",
     accent: "text-blue-300",
   },
   {
@@ -31,7 +31,7 @@ const demos = [
     title: "3D Ecommerce Product Website Concept",
     desc: "Next-gen interactive ecommerce with 3D product storytelling, scroll animations, catalogue and a premium shopping experience.",
     href: "https://orbit-carry-bag-3d-phi.vercel.app/",
-    gradient: "from-cyan-500/25 via-teal-500/20 to-emerald-500/20",
+    shot: "https://s.wordpress.com/mshots/v1/https%3A%2F%2Forbit-carry-bag-3d-phi.vercel.app%2F?w=1024&h=640",
     accent: "text-cyan-300",
   },
 ];
@@ -66,28 +66,27 @@ export default function Portfolio() {
               className="group card-lift glass rounded-2xl overflow-hidden relative"
               data-testid={`portfolio-card-${i}`}
             >
-              {/* Browser frame preview */}
-              <div className={`h-56 sm:h-64 bg-gradient-to-br ${d.gradient} relative overflow-hidden`}>
-                <div className="absolute top-3 left-3 flex items-center gap-1.5">
+              {/* Browser frame preview with live screenshot */}
+              <div className="h-56 sm:h-64 relative overflow-hidden bg-gradient-to-br from-purple-500/20 via-blue-500/10 to-cyan-500/20">
+                <img
+                  src={d.shot}
+                  alt={d.title}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover object-top opacity-90 group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400/80" />
                 </div>
-                <div className="absolute top-3 right-3 text-[10px] uppercase tracking-widest text-white/70 bg-black/40 border border-white/20 rounded-full px-2.5 py-1">
+                <div className="absolute top-3 right-3 text-[10px] uppercase tracking-widest text-white/90 bg-black/60 border border-white/20 rounded-full px-2.5 py-1 z-10">
                   Live Demo
                 </div>
-                <div className="absolute inset-0 grid place-items-center px-6 text-center">
-                  <div className="glass-strong rounded-xl px-4 py-3 max-w-xs">
-                    <div className={`text-[10px] uppercase tracking-widest ${d.accent}`}>{d.tag}</div>
-                    <div className="font-heading font-bold text-sm mt-1 line-clamp-2">{d.title}</div>
-                    <div className="mt-3 flex gap-1">
-                      <div className="h-1.5 flex-1 rounded bg-white/25" />
-                      <div className="h-1.5 flex-1 rounded bg-white/15" />
-                      <div className="h-1.5 flex-1 rounded bg-white/10" />
-                    </div>
-                  </div>
+                <div className={`absolute bottom-3 left-4 z-10 text-[10px] uppercase tracking-widest ${d.accent} font-semibold`}>
+                  {d.tag}
                 </div>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
               </div>
 
               <div className="p-6">

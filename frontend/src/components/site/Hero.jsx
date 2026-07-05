@@ -81,9 +81,9 @@ export default function Hero() {
             className="mt-6 max-w-xl text-base sm:text-lg text-white/70 leading-relaxed"
             data-testid="hero-subheadline"
           >
-            Avero builds modern, secure, SEO-ready websites with premium UI,
-            AI chatbots, domain, hosting, maintenance — and{" "}
-            <span className="text-white font-semibold">48-hour delivery</span>.
+            Avero is a modern IT studio — starting with the fastest premium websites in India:
+            AI chatbots, SEO, hosting, maintenance & <span className="text-white font-semibold">48-hour delivery</span>.
+            Coming soon: AI marketing, ads & model fine-tuning for your business.
           </motion.p>
 
           <motion.div
