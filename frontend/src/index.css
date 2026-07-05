@@ -189,6 +189,13 @@ body {
 }
 .input-avero::placeholder { color: #6b7280; }
 
+/* Fallback: dark background for any remaining native <select> option popups (OS-dependent) */
+select.input-avero,
+select.input-avero option {
+    background-color: #0b0d1a;
+    color: #fff;
+}
+
 /* Motion reduce */
 @media (prefers-reduced-motion: reduce) {
     .floaty, .slow-spin, .pulse-ring, .marquee-track { animation: none !important; }

@@ -2,6 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { Phone, MessageCircle, Mail, Globe, Send } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { API_BASE, AVERO } from "@/lib/config";
 
 const websiteTypes = [
@@ -22,6 +25,7 @@ export default function ContactForm() {
   const [done, setDone] = useState(false);
 
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const setField = (k) => (v) => setForm({ ...form, [k]: v });
 
   const submit = async (e) => {
     e.preventDefault();
@@ -49,10 +53,10 @@ export default function ContactForm() {
         <div className="lg:col-span-5">
           <p className="text-xs uppercase tracking-[0.3em] text-cyan-300">Contact</p>
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold mt-4">
-            Let's build your <span className="gradient-text">online presence</span>
+            Let&apos;s build your <span className="gradient-text">online presence</span>
           </h2>
           <p className="text-white/70 mt-4">
-            Share a few details. We'll get back on WhatsApp/Call within an hour.
+            Share a few details. We&apos;ll get back on WhatsApp/Call within an hour.
           </p>
 
           <div className="mt-8 space-y-3">
@@ -122,22 +126,40 @@ export default function ContactForm() {
                     <input data-testid="input-business-type" className="input-avero" value={form.business_type} onChange={update("business_type")} placeholder="Salon / CA Firm / Ecommerce…" />
                   </Field>
                   <Field label="Website Needed For" name="website_type">
-                    <select data-testid="select-website-type" className="input-avero" value={form.website_type} onChange={update("website_type")}>
-                      <option value="">Choose…</option>
-                      {websiteTypes.map((v) => <option key={v} value={v}>{v}</option>)}
-                    </select>
+                    <Select value={form.website_type} onValueChange={setField("website_type")}>
+                      <SelectTrigger data-testid="select-website-type" className="input-avero h-auto py-2.5 rounded-[10px] border-white/10 bg-white/[0.03] data-[placeholder]:text-white/40">
+                        <SelectValue placeholder="Choose…" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0b0d1a] border-white/10 text-white">
+                        {websiteTypes.map((v) => (
+                          <SelectItem key={v} value={v} className="text-white focus:bg-white/10 focus:text-white data-[state=checked]:bg-cyan-500/20">{v}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </Field>
                   <Field label="Budget" name="budget">
-                    <select data-testid="select-budget" className="input-avero" value={form.budget} onChange={update("budget")}>
-                      <option value="">Choose…</option>
-                      {budgets.map((v) => <option key={v} value={v}>{v}</option>)}
-                    </select>
+                    <Select value={form.budget} onValueChange={setField("budget")}>
+                      <SelectTrigger data-testid="select-budget" className="input-avero h-auto py-2.5 rounded-[10px] border-white/10 bg-white/[0.03] data-[placeholder]:text-white/40">
+                        <SelectValue placeholder="Choose…" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0b0d1a] border-white/10 text-white">
+                        {budgets.map((v) => (
+                          <SelectItem key={v} value={v} className="text-white focus:bg-white/10 focus:text-white data-[state=checked]:bg-cyan-500/20">{v}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </Field>
                   <Field label="Timeline" name="timeline" full>
-                    <select data-testid="select-timeline" className="input-avero" value={form.timeline} onChange={update("timeline")}>
-                      <option value="">Choose…</option>
-                      {timelines.map((v) => <option key={v} value={v}>{v}</option>)}
-                    </select>
+                    <Select value={form.timeline} onValueChange={setField("timeline")}>
+                      <SelectTrigger data-testid="select-timeline" className="input-avero h-auto py-2.5 rounded-[10px] border-white/10 bg-white/[0.03] data-[placeholder]:text-white/40">
+                        <SelectValue placeholder="Choose…" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0b0d1a] border-white/10 text-white">
+                        {timelines.map((v) => (
+                          <SelectItem key={v} value={v} className="text-white focus:bg-white/10 focus:text-white data-[state=checked]:bg-cyan-500/20">{v}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </Field>
                 </div>
                 <Field label="Message" name="message">
