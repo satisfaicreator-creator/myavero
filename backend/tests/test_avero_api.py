@@ -187,3 +187,27 @@ def test_chat_sse_stream():
     assert got_session, "no session event"
     assert got_delta, "no delta event"
     assert got_done, "no done event"
+
+
+# -------- Chat rule-based replies --------
+@pytest.mark.parametrize("msg,needle", [
+    ("what is the price?", "2,999"),
+    ("48 hour delivery?", "48 hours"),
+    ("random gibberish here", "9680816234"),
+])
+def test_chat_rule_based_replies(msg, needle):
+    r = requests.post(f"{API}/chat", json={"message": msg}, stream=True, timeout=45)
+    assert r.status_code == 200
+    reply = ""
+    for raw in r.iter_lines(decode_unicode=True):
+        if not raw or not raw.startswith("data:"):
+            continue
+        try:
+            evt = json.loads(raw[5:].strip())
+        except Exception:
+            continue
+        if evt.get("type") == "delta":
+            reply += evt.get("content", "")
+        elif evt.get("type") == "done":
+            break
+    assert needle in reply, f"expected {needle!r} in reply, got: {reply[:200]}"

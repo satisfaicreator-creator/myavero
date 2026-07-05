@@ -1,100 +1,97 @@
-# Avero — Vercel-Only Deployment Guide
+# Avero — Vercel-Only Deployment Guide (Zero Recurring Cost)
 
-Everything (frontend + backend + database connection) is deployed to **Vercel only**.
-The FastAPI folder at `/app/backend` is now optional (used only for local development inside Emergent).
-Production runs on **Vercel Serverless Functions** in `/app/frontend/api/`.
+Everything runs on **Vercel + MongoDB Atlas + Resend** — all free tiers. No OpenAI, no Render, no paid services.
+Chatbot uses a **rule-based responder** (keyword-matched canned replies streamed word-by-word) — the visitor experience feels like AI but costs ₹0.
 
 ## Architecture
 ```
 Vercel project (root: frontend/)
-├── src/            # React (CRA) — served as static site + SPA
-├── build/          # Compiled output
-└── api/            # Serverless Node.js functions (auto-deployed)
-     ├── enquiries.js
-     ├── blog.js
-     ├── blog/[slug].js
-     ├── admin/login.js
-     ├── admin/enquiries.js
-     ├── admin/enquiries/[id].js
+├── src/               # React (CRA) — served as static site
+└── api/               # Vercel Serverless Functions (Node.js)
+     ├── enquiries.js         # Save lead + send Resend email
+     ├── blog.js / blog/[slug].js
+     ├── admin/login.js       # JWT admin auth
+     ├── admin/enquiries.js   # list + [id].js patch status
      ├── admin/stats.js
-     ├── chat.js         (SSE streaming OpenAI chat)
-     └── index.js        (health check)
+     ├── chat.js              # Rule-based SSE chatbot
+     └── _lib/                # db.js, auth.js, responder.js, blog-data.js
 ```
-No separate Render / Railway / FastAPI hosting required.
 
-## Step 1 — MongoDB Atlas
-1. https://www.mongodb.com/cloud/atlas/register — sign up, create free M0 cluster (AWS Mumbai `ap-south-1` is closest to India).
-2. Database Access → create user `avero_admin` + auto-generated password. Save the password.
-3. Network Access → add IP `0.0.0.0/0` (Vercel uses dynamic IPs).
-4. Connect → Drivers → copy the connection string. Replace `<password>` with the real password.
-   You now have your `MONGO_URL`, e.g.:
+## Step 1 — MongoDB Atlas (Free M0, 512 MB)
+1. https://www.mongodb.com/cloud/atlas/register → sign up.
+2. Build Database → Free M0 (AWS Mumbai `ap-south-1`).
+3. Database Access → create user (`avero_admin` + auto-gen password — save it).
+4. Network Access → Add `0.0.0.0/0` (allow all — Vercel uses dynamic IPs).
+5. Connect → Drivers → copy connection string, replace `<password>`:
    ```
-   mongodb+srv://avero_admin:XXXXXXXX@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
+   mongodb+srv://avero_admin:XXXX@cluster0.xxx.mongodb.net/?retryWrites=true&w=majority
    ```
 
-## Step 2 — Push repo to GitHub
-Commit the entire `/app` folder to a GitHub repo. Both `vercel.json` files (repo root + `/frontend`) are included.
+## Step 2 — Resend (Free: 100 emails/day)
+1. https://resend.com → sign up.
+2. API Keys → **Create API key** → copy the `re_...` value.
+3. **Optional but recommended**: Domains → Add `theavero.dev` → follow DNS instructions. Once verified, you can send from `no-reply@theavero.dev` (better deliverability than `onboarding@resend.dev`).
 
-## Step 3 — Import project into Vercel
-1. https://vercel.com/new — import your GitHub repo.
-2. **Root Directory** → click "Edit" → select `frontend`.
-3. **Framework Preset** → Create React App (auto-detected from `vercel.json`).
-4. Click **Deploy**. First deploy will fail because env vars are missing — that's expected.
+## Step 3 — Push repo to GitHub
+Commit the whole `/app` folder. Both `vercel.json` files are ready.
 
-## Step 4 — Add environment variables in Vercel
-Project Settings → Environment Variables. Add these **9 variables** (apply to Production, Preview, Development):
+## Step 4 — Import into Vercel
+1. https://vercel.com/new → import your GitHub repo.
+2. **Root Directory** → set to `frontend`.
+3. Framework Preset auto-detects **Create React App** from `vercel.json`.
+4. Click Deploy (will fail first time on missing env — expected).
 
-| Key | Example value | Where to get it |
+## Step 5 — Add Environment Variables in Vercel
+Settings → Environment Variables → add these **7 vars** (apply to Production + Preview + Development):
+
+| Key | Example | Where from |
 |---|---|---|
-| `MONGO_URL` | `mongodb+srv://avero_admin:pw@cluster0.xxx.mongodb.net/?retryWrites=true&w=majority` | From Step 1 |
-| `DB_NAME` | `avero_prod` | Any name |
-| `OPENAI_API_KEY` | `sk-proj-...` | https://platform.openai.com/api-keys (adds ~$0.15 per 1M tokens on gpt-4o-mini — very cheap) |
-| `OPENAI_MODEL` | `gpt-4o-mini` | Any OpenAI chat model |
-| `RESEND_API_KEY` | `re_...` | https://resend.com → API Keys |
-| `SENDER_EMAIL` | `no-reply@theavero.dev` | Must verify domain in Resend first, or use `onboarding@resend.dev` |
+| `MONGO_URL` | `mongodb+srv://avero_admin:XXXX@cluster0.xxx.mongodb.net/?retryWrites=true&w=majority` | Step 1 |
+| `DB_NAME` | `avero_prod` | Any name — Atlas creates it on first write |
+| `RESEND_API_KEY` | `re_...` | Step 2 |
+| `SENDER_EMAIL` | `onboarding@resend.dev` **OR** `no-reply@theavero.dev` (if domain verified) | Resend |
 | `ADMIN_RECIPIENT_EMAIL` | `satisfaicreator@gmail.com` | Your inbox |
-| `JWT_SECRET` | a random 32+ char string | Generate: `openssl rand -hex 32` |
+| `JWT_SECRET` | 32+ char random string — run `openssl rand -hex 32` | Any |
 | `ADMIN_EMAIL` | `admin@theavero.dev` | Auto-seeded on first API call |
-| `ADMIN_PASSWORD` | strong password | Auto-seeded (change from `Avero@2999` for prod) |
+| `ADMIN_PASSWORD` | strong password (change from `Avero@2999`) | Auto-seeded |
 
-**Do NOT set** `REACT_APP_BACKEND_URL` — leaving it empty makes the frontend call `/api/*` on the same Vercel domain (which is exactly what we want).
+**Do NOT set `REACT_APP_BACKEND_URL`** — leaving it empty makes the frontend call same-origin `/api/*`, which is what we want.
 
-## Step 5 — Redeploy
-Deployments tab → three-dot on last deploy → **Redeploy** → uncheck "Use existing build cache" → Redeploy.
+## Step 6 — Redeploy
+Deployments → three-dot on last → Redeploy → uncheck build cache → Redeploy.
 
-## Step 6 — Verify
-Open your Vercel URL and check:
-- `https://YOUR-VERCEL-URL.vercel.app/` → landing page loads
-- `https://YOUR-VERCEL-URL.vercel.app/api/` → `{"service":"avero","status":"ok","runtime":"vercel-serverless"}`
-- Submit contact form → check MongoDB Atlas → **Browse Collections** → `avero_prod.enquiries` → your enquiry is there
-- Log in at `/admin/login` with `admin@theavero.dev` / `Avero@2999` → dashboard shows enquiry
-- Send message in the chatbot → streaming response
-- Email hits `satisfaicreator@gmail.com` (check spam if using `onboarding@resend.dev`)
+## Step 7 — Verify Everything
+- `https://YOUR-URL.vercel.app/` → landing page loads.
+- `https://YOUR-URL.vercel.app/api/` → `{"service":"avero","status":"ok","runtime":"vercel-serverless"}`.
+- Submit the contact form → MongoDB Atlas → Browse Collections → `avero_prod.enquiries` → your row is there.
+- Email arrives at `satisfaicreator@gmail.com` (check spam first time).
+- Log in at `/admin/login` with `admin@theavero.dev` / your password → dashboard populates.
+- Send `"what is the price?"` in the chatbot → get canned pricing reply, word-by-word.
 
-## Step 7 — Custom domain
-1. Vercel → Project → Settings → Domains → add `theavero.dev`.
-2. Add the DNS records Vercel gives you at your domain registrar.
-3. HTTPS auto-provisions.
-
-## Free-tier limits to know
-- **Vercel Hobby**: serverless function invocation duration 10s (fine for enquiries, blog, admin). Chat streaming works within 10s for short replies.
-- **MongoDB Atlas M0**: 512 MB storage, shared CPU. Plenty for 100k+ enquiries.
-- **OpenAI**: pay as you go — gpt-4o-mini is ~$0.15 per 1M input tokens. Budget $5/month covers ~30k chat replies.
-- **Resend Free**: 100 emails/day, 3,000/month. Enough unless you're getting >100 leads/day.
-
-Upgrade Vercel to Pro ($20/mo) later if:
-- Chatbot replies get cut off at 10s
-- Cold-start latency is annoying
-
-## Local development (optional — Emergent env)
-Keep `/app/backend/` for local dev. It's a FastAPI clone of the same endpoints. `REACT_APP_BACKEND_URL` in `frontend/.env` points to the local FastAPI. Delete `/app/backend/` and `/app/render.yaml` before pushing to production if you want a clean repo — but Vercel ignores them anyway (project root is `frontend/`).
+## Step 8 — Custom domain
+Vercel → Settings → Domains → add `theavero.dev` → set DNS → SSL auto-provisions.
 
 ---
 
-# SEO checklist — do this after deploy
-1. Verify `https://theavero.dev` in Google Search Console → paste token into `google-site-verification` meta.
-2. Verify in Bing Webmaster Tools → paste token into `msvalidate.01`.
-3. Submit `https://theavero.dev/sitemap.xml` in Search Console.
-4. Create Google Business Profile (biggest local-SEO win).
-5. Publish 1 blog post/week targeting long-tail keywords ("48-hour website for CA firm", "affordable ecommerce website Jaipur", etc.)
-6. Get backlinks from Clutch / GoodFirms / DesignRush / LinkedIn / Quora.
+## Total monthly cost (as configured)
+| Service | Free-tier limit | Cost |
+|---|---|---|
+| Vercel Hobby | 100 GB bandwidth, 100 GB-hrs functions | **₹0** |
+| MongoDB Atlas M0 | 512 MB storage | **₹0** |
+| Resend | 100 emails/day, 3,000/month | **₹0** |
+| **Total** | — | **₹0/month** |
+
+## When to upgrade (only if you outgrow free tier)
+- **Vercel Pro ($20/mo)** — if chatbot streams hit the 10-second timeout OR bandwidth exceeds 100 GB.
+- **Resend Pro ($20/mo)** — if you send >3,000 emails/month.
+- **Upgrade to real AI chatbot** — add `OPENAI_API_KEY` env var later; a 5-line code swap enables OpenAI streaming for genuinely conversational replies (~$5/month covers 30k chat replies).
+
+---
+
+## SEO — do after deploy
+1. https://search.google.com/search-console → verify property → paste token into `google-site-verification` meta in `public/index.html`.
+2. Submit `https://theavero.dev/sitemap.xml`.
+3. https://www.bing.com/webmasters → verify → paste into `msvalidate.01`.
+4. https://business.google.com → create Google Business Profile (biggest local-SEO win).
+5. Publish 1 case study per week targeting long-tail keywords ("48-hour website for CA firm", "affordable ecommerce Jaipur", etc).
+6. Get listed on Clutch / GoodFirms / DesignRush.

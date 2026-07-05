@@ -1,0 +1,30 @@
+{
+  "summary": "Rule-based chatbot / OpenAI-removal iteration verified. Backend: 18/18 pytest cases pass on live preview URL (health, enquiries CRUD, admin login/list/stats/patch, blog list+single+404, robots, sitemap, chat SSE + 3 new parametrised rule-based reply tests covering pricing, 48-hour delivery, and default fallback). Server no longer imports openai or emergentintegrations; /app/backend/.env has no OPENAI_* / EMERGENT_LLM_KEY entries; /app/backend/requirements.txt has no openai or emergentintegrations package; /app/backend/responder.py has 12 rules + DEFAULT_REPLY, match_reply() works. Vercel serverless: node --check passes on /app/frontend/api/chat.js and /app/frontend/api/_lib/responder.js; chat.js imports matchReply (not openai); dynamic ESM import verified matchReply('what is the cost?') returns pricing rule and matchReply('blah xyz') returns DEFAULT_REPLY; frontend/package.json has no 'openai' dependency. Frontend UI: chatbot-toggle → chatbot-panel opens, typing 'what is the pricing?' streams the canned ₹2,999 pricing reply word-by-word via SSE; no console errors. DEPLOY.md: OpenAI references removed from cost table + env vars; cost table now shows ₹0/month. Minor doc issue: DEPLOY.md text says '7 vars' but the env-var table actually lists 8 entries (matches spec) — text-count typo only.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "landing (Emergent preview only)", "issues": ["'Made with Emergent' badge overlaps chatbot-toggle FAB at bottom-right; direct click intercepted. This is a preview-only overlay and will not affect production Vercel deployment. Testing worked via JS .click()."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_avero_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "DEPLOY.md Step 5 heading says 'these 7 vars' but the env-var table below has 8 rows (MONGO_URL, DB_NAME, RESEND_API_KEY, SENDER_EMAIL, ADMIN_RECIPIENT_EMAIL, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD). Update the text to say '8 vars' for consistency.",
+    "DEPLOY.md 'When to upgrade' section still mentions 'Upgrade to real AI chatbot — add OPENAI_API_KEY env var later'. Since the whole iteration is about removing OpenAI, main agent may want to either remove this hint or reword it (informational, not a bug)."
+  ],
+  "critical_code_review_comments": [
+    "backend/server.py /api/chat: assistant message is persisted AFTER the SSE stream completes inside event_gen() — if the client disconnects mid-stream (rare on 48-word replies but possible), the assistant row will not be saved. User message IS saved upfront, so lead data isn't lost. Acceptable trade-off, not blocking.",
+    "backend/responder.py rule for '48 hour' uses just the token '48' which will also match anywhere containing that substring (e.g. '4800 rupees'). Low real-world risk given the rule ordering and canned reply is still relevant, but flag for awareness.",
+    "backend/responder.py: keyword 'hour' + 'fast' + 'quick' overlap with plausible pricing questions ('how much for a quick site?') — pricing rule is checked first so this is fine, but ordering matters and should stay first for pricing.",
+    "frontend/api/chat.js: uses new Promise(r => setTimeout(r, 25)) per word — a 60-word reply = ~1.5s, well within Vercel Hobby 10s limit. Safe.",
+    "frontend/api/_lib/responder.js is ESM (export {matchReply}) and chat.js uses ESM import — Vercel Node 20 runtime supports this. Local node --check emits a MODULE_TYPELESS_PACKAGE_JSON warning (cosmetic); optionally add \"type\":\"module\" to a package.json inside /app/frontend/api/ to silence it, but not required for Vercel."
+  ],
+  "updated_files": ["/app/backend/tests/test_avero_api.py (added 3 parametrised rule-based chat reply tests)"],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "100%"},
+  "test_credentials": "admin@theavero.dev / Avero@2999",
+  "seed_data_creation": "None (added a TEST_ enquiry via existing test; cleaned via status patch flow only — same as prior iterations).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Rule-based chatbot is fully wired end-to-end: FastAPI /api/chat streams SSE using responder.py match_reply, frontend Chatbot.jsx SSE parser renders the tokens correctly. Vercel serverless equivalent at /app/frontend/api/chat.js uses /app/frontend/api/_lib/responder.js (mirror). No AI keys anywhere. 'Made with Emergent' badge covers the chatbot FAB in the preview URL only — use JS .click() on [data-testid=chatbot-toggle] to open it. All 18 backend tests are the regression suite for future iterations."
+}
