@@ -1,148 +1,100 @@
-# Avero — Full Deployment & SEO Guide
+# Avero — Vercel-Only Deployment Guide
 
-## 1. Where to deploy the FastAPI backend
+Everything (frontend + backend + database connection) is deployed to **Vercel only**.
+The FastAPI folder at `/app/backend` is now optional (used only for local development inside Emergent).
+Production runs on **Vercel Serverless Functions** in `/app/frontend/api/`.
 
-You **cannot** deploy the FastAPI backend on Vercel — Vercel is for static/serverless (Next.js) apps.
-Deploy the backend to one of these (all have free tiers):
+## Architecture
+```
+Vercel project (root: frontend/)
+├── src/            # React (CRA) — served as static site + SPA
+├── build/          # Compiled output
+└── api/            # Serverless Node.js functions (auto-deployed)
+     ├── enquiries.js
+     ├── blog.js
+     ├── blog/[slug].js
+     ├── admin/login.js
+     ├── admin/enquiries.js
+     ├── admin/enquiries/[id].js
+     ├── admin/stats.js
+     ├── chat.js         (SSE streaming OpenAI chat)
+     └── index.js        (health check)
+```
+No separate Render / Railway / FastAPI hosting required.
 
-### Option A — Render.com (recommended, easiest)
-1. Go to https://render.com → sign up (GitHub login is fine).
-2. Push this repo to GitHub if you haven't (the whole `/app` folder, or split backend into its own repo).
-3. Click **New → Web Service** → connect your GitHub repo.
-4. Render will auto-detect the `render.yaml` at repo root and pre-fill everything.
-5. In the **Environment** tab, fill in the secrets that Render couldn't auto-generate (see env-var list below).
-6. Click **Deploy**. In ~3 min you'll get a URL like `https://avero-backend.onrender.com`.
-7. **This URL is what you paste into Vercel as `REACT_APP_BACKEND_URL`.**
-
-### Option B — Railway.app
-Similar flow — connect GitHub, Railway auto-detects Python, set env vars, deploy. URL like `https://avero-production.up.railway.app`.
-
-### Option C — Fly.io
-CLI-based: `fly launch` from `/app/backend`. Slightly more technical but cheap and global.
-
-### Option D — DigitalOcean / AWS / your VPS
-Only if you want full control. `uvicorn server:app --host 0.0.0.0 --port 8001` + a reverse proxy (nginx/Caddy).
-
-## 2. MongoDB — where the leads live
-
-The FastAPI backend uses MongoDB via the `MONGO_URL` env var. In your local Emergent env this is `mongodb://localhost:27017`. In production you need a hosted MongoDB.
-
-### MongoDB Atlas (free tier — recommended)
-1. Go to https://www.mongodb.com/cloud/atlas → sign up.
-2. Create a **Free Shared Cluster** (M0 tier, 512 MB — plenty for lead capture).
-3. Under **Database Access**, create a database user (username + password).
-4. Under **Network Access**, add IP `0.0.0.0/0` (allow from anywhere — for Render/Railway).
-5. Click **Connect → Drivers** → copy the connection string, it looks like:
+## Step 1 — MongoDB Atlas
+1. https://www.mongodb.com/cloud/atlas/register — sign up, create free M0 cluster (AWS Mumbai `ap-south-1` is closest to India).
+2. Database Access → create user `avero_admin` + auto-generated password. Save the password.
+3. Network Access → add IP `0.0.0.0/0` (Vercel uses dynamic IPs).
+4. Connect → Drivers → copy the connection string. Replace `<password>` with the real password.
+   You now have your `MONGO_URL`, e.g.:
    ```
-   mongodb+srv://<user>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
+   mongodb+srv://avero_admin:XXXXXXXX@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
    ```
-6. Paste this as `MONGO_URL` in Render's environment variables.
-7. Set `DB_NAME=avero_prod` (any name — Atlas creates it on first write).
 
-**Collections that will be created automatically** on first use:
-- `admins` — the seeded admin account (`admin@theavero.dev`)
-- `enquiries` — every lead-form submission
-- `blog_posts` — the 4 seeded case studies
-- `chat_messages` — chatbot conversation history
+## Step 2 — Push repo to GitHub
+Commit the entire `/app` folder to a GitHub repo. Both `vercel.json` files (repo root + `/frontend`) are included.
 
-You don't need to create these manually. `seed_admin()` and `seed_blog()` run on backend startup and upsert idempotently.
+## Step 3 — Import project into Vercel
+1. https://vercel.com/new — import your GitHub repo.
+2. **Root Directory** → click "Edit" → select `frontend`.
+3. **Framework Preset** → Create React App (auto-detected from `vercel.json`).
+4. Click **Deploy**. First deploy will fail because env vars are missing — that's expected.
 
-## 3. All env vars — checklist
+## Step 4 — Add environment variables in Vercel
+Project Settings → Environment Variables. Add these **9 variables** (apply to Production, Preview, Development):
 
-### Backend (Render / Railway) — 10 vars
-| Key | Value / Example | Notes |
+| Key | Example value | Where to get it |
 |---|---|---|
-| `MONGO_URL` | `mongodb+srv://user:pass@cluster0.xxx.mongodb.net/?retryWrites=true&w=majority` | From MongoDB Atlas |
+| `MONGO_URL` | `mongodb+srv://avero_admin:pw@cluster0.xxx.mongodb.net/?retryWrites=true&w=majority` | From Step 1 |
 | `DB_NAME` | `avero_prod` | Any name |
-| `CORS_ORIGINS` | `https://theavero.dev,https://www.theavero.dev` | Comma-separated |
-| `EMERGENT_LLM_KEY` | your Emergent Universal key | For AI chatbot |
-| `RESEND_API_KEY` | your Resend key (starts `re_`) | For lead-email notifications |
-| `SENDER_EMAIL` | `no-reply@theavero.dev` (verified in Resend) OR `onboarding@resend.dev` | Verified domain gives higher deliverability |
-| `ADMIN_RECIPIENT_EMAIL` | `satisfaicreator@gmail.com` | Where lead emails are sent |
-| `JWT_SECRET` | long random string (Render can auto-generate) | For admin JWT tokens |
-| `ADMIN_EMAIL` | `admin@theavero.dev` | Auto-seeded on startup |
-| `ADMIN_PASSWORD` | strong password (e.g. `Avero@2999` — change for prod) | Auto-seeded |
+| `OPENAI_API_KEY` | `sk-proj-...` | https://platform.openai.com/api-keys (adds ~$0.15 per 1M tokens on gpt-4o-mini — very cheap) |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Any OpenAI chat model |
+| `RESEND_API_KEY` | `re_...` | https://resend.com → API Keys |
+| `SENDER_EMAIL` | `no-reply@theavero.dev` | Must verify domain in Resend first, or use `onboarding@resend.dev` |
+| `ADMIN_RECIPIENT_EMAIL` | `satisfaicreator@gmail.com` | Your inbox |
+| `JWT_SECRET` | a random 32+ char string | Generate: `openssl rand -hex 32` |
+| `ADMIN_EMAIL` | `admin@theavero.dev` | Auto-seeded on first API call |
+| `ADMIN_PASSWORD` | strong password | Auto-seeded (change from `Avero@2999` for prod) |
 
-### Frontend (Vercel) — 1 var
-| Key | Value | Notes |
-|---|---|---|
-| `REACT_APP_BACKEND_URL` | `https://avero-backend.onrender.com` (no trailing slash) | Points to the Render URL from step 1 |
+**Do NOT set** `REACT_APP_BACKEND_URL` — leaving it empty makes the frontend call `/api/*` on the same Vercel domain (which is exactly what we want).
 
-## 4. Post-deploy checklist
-- [ ] Add your custom domain `theavero.dev` in Vercel Domains → Vercel gives you DNS records → set them in your domain registrar (GoDaddy/Namecheap/Cloudflare).
-- [ ] In Resend → **Domains** → verify `theavero.dev` — this unlocks sending from `no-reply@theavero.dev` (much better inbox delivery than `onboarding@resend.dev`).
-- [ ] In Vercel env vars, set `REACT_APP_BACKEND_URL` to your Render URL, then redeploy.
-- [ ] Visit `https://theavero.dev/admin/login` → test admin login.
-- [ ] Submit a test lead form → confirm the enquiry appears in the dashboard AND you receive the email.
+## Step 5 — Redeploy
+Deployments tab → three-dot on last deploy → **Redeploy** → uncheck "Use existing build cache" → Redeploy.
+
+## Step 6 — Verify
+Open your Vercel URL and check:
+- `https://YOUR-VERCEL-URL.vercel.app/` → landing page loads
+- `https://YOUR-VERCEL-URL.vercel.app/api/` → `{"service":"avero","status":"ok","runtime":"vercel-serverless"}`
+- Submit contact form → check MongoDB Atlas → **Browse Collections** → `avero_prod.enquiries` → your enquiry is there
+- Log in at `/admin/login` with `admin@theavero.dev` / `Avero@2999` → dashboard shows enquiry
+- Send message in the chatbot → streaming response
+- Email hits `satisfaicreator@gmail.com` (check spam if using `onboarding@resend.dev`)
+
+## Step 7 — Custom domain
+1. Vercel → Project → Settings → Domains → add `theavero.dev`.
+2. Add the DNS records Vercel gives you at your domain registrar.
+3. HTTPS auto-provisions.
+
+## Free-tier limits to know
+- **Vercel Hobby**: serverless function invocation duration 10s (fine for enquiries, blog, admin). Chat streaming works within 10s for short replies.
+- **MongoDB Atlas M0**: 512 MB storage, shared CPU. Plenty for 100k+ enquiries.
+- **OpenAI**: pay as you go — gpt-4o-mini is ~$0.15 per 1M input tokens. Budget $5/month covers ~30k chat replies.
+- **Resend Free**: 100 emails/day, 3,000/month. Enough unless you're getting >100 leads/day.
+
+Upgrade Vercel to Pro ($20/mo) later if:
+- Chatbot replies get cut off at 10s
+- Cold-start latency is annoying
+
+## Local development (optional — Emergent env)
+Keep `/app/backend/` for local dev. It's a FastAPI clone of the same endpoints. `REACT_APP_BACKEND_URL` in `frontend/.env` points to the local FastAPI. Delete `/app/backend/` and `/app/render.yaml` before pushing to production if you want a clean repo — but Vercel ignores them anyway (project root is `frontend/`).
 
 ---
 
-# SEO — What's done + what's still needed to rank #1 for "website development"
-
-## ✅ Already implemented (technical SEO — the foundation)
-| Item | Status |
-|---|---|
-| `<title>` optimized (Avero \| Premium Websites in 48 Hours · Starting ₹2,999) | ✅ |
-| Meta description (keyword-rich, ~155 chars) | ✅ |
-| Meta keywords | ✅ (deprecated by Google, but harmless) |
-| Canonical link | ✅ |
-| Open Graph (og:title, og:description, og:image, og:url, og:type, og:site_name, og:locale) | ✅ |
-| Twitter Card (summary_large_image) | ✅ |
-| hreflang alternates (en / hi / x-default) | ✅ |
-| Search-engine verification meta placeholders (Google, Bing, Yandex) | ✅ (fill in tokens) |
-| `robots.txt` | ✅ |
-| `sitemap.xml` | ✅ (root, blog list, 4 blog posts) |
-| JSON-LD: Organization | ✅ |
-| JSON-LD: WebSite (with SearchAction) | ✅ |
-| JSON-LD: ProfessionalService + Offer (₹2,999 INR) | ✅ |
-| JSON-LD: LocalBusiness (with Jaipur/Rajasthan/India address) | ✅ (just added) |
-| JSON-LD: FAQPage (5 Q&A — Google shows FAQ rich snippets) | ✅ |
-| JSON-LD: BreadcrumbList | ✅ |
-| JSON-LD: Article per blog post | ✅ |
-| Semantic HTML5 (`<main>`, `<article>`, `<nav>`, `<h1>` unique) | ✅ |
-| Mobile-first responsive | ✅ |
-| Font preconnect + font-display: swap | ✅ |
-| Alt text on all images | ✅ |
-| Loading="lazy" on non-critical images | ✅ |
-| SPA fallback for direct blog URLs (via vercel.json rewrite) | ✅ |
-| Hindi language variant for local audience | ✅ |
-
-## ⚠️ You need to do (SEO admin tasks — free but manual)
-1. **Google Search Console** — https://search.google.com/search-console
-   - Add your property (`https://theavero.dev`)
-   - Copy the verification meta tag → paste it into `google-site-verification` in `index.html` (replace `REPLACE_WITH_GSC_TOKEN`)
-   - Submit `https://theavero.dev/sitemap.xml` in the Sitemaps section.
-2. **Bing Webmaster Tools** — https://www.bing.com/webmasters
-   - Same drill; paste token into `msvalidate.01`.
-3. **Google Business Profile** — https://business.google.com
-   - Free listing that dominates local searches ("website designer Jaipur", "web development near me").
-   - Fill in address, hours, phone, and add a link to `theavero.dev`.
-   - Post updates monthly — this alone drives free traffic.
-4. **Backlinks** — the single biggest lever for competitive keywords like "website development":
-   - List Avero on: Clutch.co, GoodFirms, DesignRush, DesignWanted, ThemeForest author profile, Behance, Dribbble.
-   - Answer relevant questions on Quora and Reddit (r/webdev, r/india) with genuine value + a link back.
-   - Publish your case studies on LinkedIn / Medium with a canonical link back to your `/blog/{slug}`.
-5. **Content velocity**:
-   - Publish **1 new blog post per week** (case study, industry deep-dive, "website checklist for X business").
-   - Target long-tail keywords: "48 hour website for CA firm", "affordable ecommerce website Jaipur", "AI chatbot for salon website" — you'll rank these fast because competition is thin.
-6. **Add a physical address in the footer** — Google trusts sites with real NAP (Name-Address-Phone) info. Even a co-working address is fine.
-
-## 🚫 Realistic honest note on ranking #1 for "website development"
-- The keyword **"website development"** is one of the most competitive in the world (millions of results).
-- Ranking #1 for it on Google.com globally is **not realistic** in <18 months even with perfect SEO — you're competing with WordPress.com, Wix, GoDaddy, HubSpot, Webflow.
-- **What IS realistic and where your traffic will come from:**
-  - `website development in Jaipur` — reachable in ~3–6 months with Google Business Profile + local backlinks.
-  - `48 hour website development` — reachable in ~2–3 months (very few competitors on this angle).
-  - `affordable ai website development India` — reachable in ~4 months.
-  - `website development for CA firms / salons / cafes / wholesalers` — reachable in ~1–3 months per keyword.
-- **Focus on 30–50 long-tail queries** that each bring 100–1,000 searches/month. Sum of those beats a single #1 for "website development" every time.
-
-## 🎯 30-day action plan (in order)
-1. Deploy backend + frontend (this guide, steps 1–3).
-2. Verify Google Search Console + Bing + submit sitemap.
-3. Create Google Business Profile.
-4. Publish 1 blog post/week for 4 weeks (targeting long-tail keywords above).
-5. Build 10 backlinks from directories (Clutch, GoodFirms) + LinkedIn + Quora answers.
-6. Track rankings weekly via free tools: Google Search Console (impressions/clicks), Ahrefs Webmaster Tools (free), Ubersuggest (free tier).
-
-Do this and you'll be ranked top-3 for at least 5 long-tail Indian web-development queries within 60–90 days — which converts far better than "website development" #1 anyway (higher intent = higher price).
+# SEO checklist — do this after deploy
+1. Verify `https://theavero.dev` in Google Search Console → paste token into `google-site-verification` meta.
+2. Verify in Bing Webmaster Tools → paste token into `msvalidate.01`.
+3. Submit `https://theavero.dev/sitemap.xml` in Search Console.
+4. Create Google Business Profile (biggest local-SEO win).
+5. Publish 1 blog post/week targeting long-tail keywords ("48-hour website for CA firm", "affordable ecommerce website Jaipur", etc.)
+6. Get backlinks from Clutch / GoodFirms / DesignRush / LinkedIn / Quora.

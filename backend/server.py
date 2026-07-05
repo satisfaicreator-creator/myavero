@@ -17,8 +17,15 @@ import json
 import bcrypt
 import jwt as pyjwt
 import resend
+from openai import AsyncOpenAI
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+# Optional Emergent SDK — only present inside the Emergent platform; not installable on Render/etc.
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone  # type: ignore
+    HAS_EMERGENT = True
+except Exception:  # pragma: no cover
+    HAS_EMERGENT = False
+
 from seed_blog import BLOG_POSTS
 
 # ---------------- Setup ----------------
@@ -29,6 +36,8 @@ MONGO_URL = os.environ["MONGO_URL"]
 DB_NAME = os.environ["DB_NAME"]
 JWT_SECRET = os.environ.get("JWT_SECRET", "change_me")
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 ADMIN_RECIPIENT_EMAIL = os.environ.get("ADMIN_RECIPIENT_EMAIL", "")
@@ -245,8 +254,11 @@ AVERO_SYSTEM_PROMPT = (
 
 @api.post("/chat")
 async def chat_stream(body: ChatIn):
-    if not EMERGENT_LLM_KEY:
-        raise HTTPException(status_code=500, detail="LLM not configured")
+    # Pick backend: prefer real OpenAI key (works on Render/prod), fallback to Emergent (only inside Emergent platform)
+    use_openai = bool(OPENAI_API_KEY)
+    use_emergent = HAS_EMERGENT and bool(EMERGENT_LLM_KEY) and not use_openai
+    if not use_openai and not use_emergent:
+        raise HTTPException(status_code=503, detail="LLM not configured. Set OPENAI_API_KEY (recommended for production) or EMERGENT_LLM_KEY.")
 
     session_id = body.session_id or str(uuid.uuid4())
 
@@ -258,23 +270,46 @@ async def chat_stream(body: ChatIn):
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
 
-    chat = LlmChat(
-        api_key=EMERGENT_LLM_KEY,
-        session_id=session_id,
-        system_message=AVERO_SYSTEM_PROMPT,
-    ).with_model("openai", "gpt-4o-mini")
-
     async def event_gen():
         collected = []
-        # first send session id
         yield f"data: {json.dumps({'type': 'session', 'session_id': session_id})}\n\n"
         try:
-            async for ev in chat.stream_message(UserMessage(text=body.message)):
-                if isinstance(ev, TextDelta):
-                    collected.append(ev.content)
-                    yield f"data: {json.dumps({'type': 'delta', 'content': ev.content})}\n\n"
-                elif isinstance(ev, StreamDone):
-                    break
+            if use_openai:
+                # Load recent history for this session (last 10 turns)
+                history = await db.chat_messages.find(
+                    {"session_id": session_id}, {"_id": 0, "role": 1, "content": 1}
+                ).sort("created_at", -1).to_list(20)
+                history.reverse()
+                messages = [{"role": "system", "content": AVERO_SYSTEM_PROMPT}]
+                for m in history:
+                    if m.get("role") in ("user", "assistant") and m.get("content"):
+                        messages.append({"role": m["role"], "content": m["content"]})
+
+                client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+                stream = await client.chat.completions.create(
+                    model=OPENAI_MODEL,
+                    messages=messages,
+                    stream=True,
+                    temperature=0.7,
+                )
+                async for chunk in stream:
+                    delta = chunk.choices[0].delta.content if chunk.choices else None
+                    if delta:
+                        collected.append(delta)
+                        yield f"data: {json.dumps({'type': 'delta', 'content': delta})}\n\n"
+            else:
+                chat = LlmChat(
+                    api_key=EMERGENT_LLM_KEY,
+                    session_id=session_id,
+                    system_message=AVERO_SYSTEM_PROMPT,
+                ).with_model("openai", "gpt-4o-mini")
+                async for ev in chat.stream_message(UserMessage(text=body.message)):
+                    if isinstance(ev, TextDelta):
+                        collected.append(ev.content)
+                        yield f"data: {json.dumps({'type': 'delta', 'content': ev.content})}\n\n"
+                    elif isinstance(ev, StreamDone):
+                        break
+
             full = "".join(collected)
             await db.chat_messages.insert_one({
                 "id": str(uuid.uuid4()),
