@@ -1,0 +1,119 @@
+{
+  "project": {
+    "name": "Avero",
+    "tagline": "We Design. You Grow.",
+    "website": "https://theavero.dev",
+    "email": "satisfaicreator@gmail.com",
+    "phone": "+91-9680816234",
+    "primary_promise": "Website delivery in 48 hours",
+    "starting_price": "₹2,999/-"
+  },
+  "theme": {
+    "mode": "dark",
+    "archetype": "Hybrid: 7 (Electric & Neon) + 5 (Luxury)",
+    "description": "High-conversion premium agency style. Deep midnight navy background with electric blue, cyan, purple, and magenta neon glows. Feels like a top-tier tech product (Vercel/Framer level) with cinematic 3D lighting."
+  },
+  "colors": {
+    "background": {
+      "base": "#050816",
+      "card": "#090B18",
+      "glass": "rgba(0, 0, 0, 0.6)"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "muted": "#A1A1AA"
+    },
+    "accent": {
+      "purple": "#7C3AED",
+      "electric_blue": "#2563EB",
+      "cyan": "#22D3EE",
+      "magenta": "#EC4899"
+    }
+  },
+  "typography": {
+    "guidelines": "Sora for bold, futuristic, tech-oriented headings (breaking standard AI patterns). Manrope for clean, highly legible body copy suitable for local business owners. Do NOT use Inter or Space Grotesk for headings.",
+    "fonts": {
+      "heading": "Sora, sans-serif",
+      "body": "Manrope, sans-serif"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight",
+      "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+      "h3": "text-xl md:text-2xl font-semibold",
+      "h4": "text-lg font-semibold uppercase tracking-widest text-cyan-400",
+      "body": "text-base leading-relaxed text-[#A1A1AA]",
+      "small": "text-sm text-[#A1A1AA]"
+    }
+  },
+  "layout_spacing": {
+    "general": "Mobile-first, generous spacing (p-6, p-8, py-20, py-32).",
+    "grid": "Bento-style grids for features and services. gap-6 to gap-8. Asymmetric spanning (col-span-4 vs col-span-8).",
+    "containers": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8."
+  },
+  "surfaces_and_components": {
+    "glassmorphism": "bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.12)]",
+    "solid_card": "bg-[#090B18] border border-white/5 shadow-2xl relative overflow-hidden",
+    "glow_effects": "Use absolute positioned elements with bg-gradient-to-r and blur-3xl for ambient lighting behind cards.",
+    "buttons": "Primary CTA uses glowing electric blue or magenta. Secondary CTA uses glassmorphism. Hover states must increase brightness.",
+    "forms": "Heavily customized Shadcn forms. Inputs should have transparent backgrounds, bottom border or subtle full border, focus ring in cyan/purple."
+  },
+  "motion_interactions": {
+    "hover": "Cards lift slightly (-translate-y-1) with increased neon border glow.",
+    "entrance": "Staggered fade-up for bento grids and lists.",
+    "hero": "Rotating headline words (e.g., 'Startups', 'Salons', 'CA Firms') using framer-motion AnimatePresence."
+  },
+  "hero_3d_direction": {
+    "style": "Cinematic 'Built for Builders' theme. Architectural cubes, glowing neon edges.",
+    "implementation": "Hybrid approach. CSS-styled 3D floating UI cards overlapping, backed by light tsparticles or pure CSS ambient radial gradients.",
+    "layout": "Bold left-aligned text (h1 + tagline), red/blue/purple CTA. Right side has floating laptops/browsers showing demo concepts."
+  },
+  "media_urls": [
+    {
+      "category": "hero_reference",
+      "url": "https://customer-assets.emergentagent.com/job_32c4107a-d948-4741-b311-0b5092d54fe6/artifacts/ozbd5mra_cc7eadfd-109d-4143-ba5a-3c230f74e182.png",
+      "description": "Primary architectural 3D reference 'Built for Builders' for the hero section."
+    },
+    {
+      "category": "abstract_neon_texture",
+      "url": "https://images.pexels.com/photos/29506612/pexels-photo-29506612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Use as ambient background overlay with low opacity or mask for glowing sections."
+    },
+    {
+      "category": "tech_laptop_dark",
+      "url": "https://images.pexels.com/photos/15940010/pexels-photo-15940010.jpeg",
+      "description": "Use in the Before/After or Services grid to showcase tech prowess."
+    },
+    {
+      "category": "neon_architecture",
+      "url": "https://images.unsplash.com/photo-1535391879778-3bae11d29a24",
+      "description": "Use for the 'World growing out of digital screen' or city visuals."
+    },
+    {
+      "category": "style_reference_1",
+      "url": "https://customer-assets.emergentagent.com/job_32c4107a-d948-4741-b311-0b5092d54fe6/artifacts/gworam8t_ChatGPT%20Image%20Jul%205%2C%202026%2C%2002_52_50%20PM%20%284%29.png",
+      "description": "Reference for neon gradients and 3D card styling."
+    },
+    {
+      "category": "style_reference_2",
+      "url": "https://customer-assets.emergentagent.com/job_32c4107a-d948-4741-b311-0b5092d54fe6/artifacts/rr941rsk_ChatGPT%20Image%20Jul%205%2C%202026%2C%2002_52_47%20PM%20%283%29.png",
+      "description": "Reference for UI lighting."
+    }
+  ],
+  "testing": {
+    "mandatory_attributes": "All interactive elements (buttons, links, form inputs, accordions) MUST include a `data-testid` attribute (e.g., `data-testid=\"hero-cta-button\"`)."
+  },
+  "instructions_to_main_agent": [
+    "Build out a premium UI in React using standard HTML elements combined with Tailwind classes for layouts.",
+    "Use Shadcn components for complex interactions but strip their default styling via Tailwind to match the dark neon aesthetic.",
+    "Do NOT use Testimonials (per user explicit request). Replace with 'Live Demo Concepts'.",
+    "Implement Marquee for announcement bar (top).",
+    "Sticky Header with Glassmorphism.",
+    "Services grid: 12 3D glass cards.",
+    "48-Hour Delivery timeline: 5 steps + stopwatch visual.",
+    "Industries grid: 14 business types using Bento UI.",
+    "Pricing: 3 tiers.",
+    "Why Choose Avero: 12 feature cards.",
+    "Include Lead Gen dashboard visual, AI Chatbot section (bottom-right live bot), Contact Form (11 fields).",
+    "Sticky mobile bottom CTA bar with Call/WhatsApp/Pricing/Contact actions."
+  ]
+}
