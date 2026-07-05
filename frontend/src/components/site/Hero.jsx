@@ -4,10 +4,11 @@ import {
   Rocket, ShieldCheck, Sparkles, Bot, Globe2, Zap, MessageCircle, PlayCircle, ArrowUpRight
 } from "lucide-react";
 import { AVERO } from "@/lib/config";
+import { useI18n } from "@/lib/i18n";
 import HeroScene from "./HeroScene";
 import ComingSoonStrip from "./ComingSoonStrip";
 
-const rotating = ["Grow", "Convert", "Rank", "Impress", "Sell", "Scale"];
+const rotatingKeys = ["hero.rotate.grow", "hero.rotate.convert", "hero.rotate.rank", "hero.rotate.impress", "hero.rotate.sell", "hero.rotate.scale"];
 
 const badges = [
   { label: "Website in 48 Hrs", icon: Zap },
@@ -21,10 +22,11 @@ const badges = [
 ];
 
 export default function Hero() {
+  const { t } = useI18n();
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % rotating.length), 2200);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setI((x) => (x + 1) % rotatingKeys.length), 2200);
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -44,7 +46,7 @@ export default function Hero() {
             data-testid="hero-eyebrow"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#22D3EE]" />
-            Premium Web Design & Development
+            {t("hero.eyebrow")}
           </motion.div>
 
           <motion.h1
@@ -54,25 +56,25 @@ export default function Hero() {
             className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.02] tracking-tight"
             data-testid="hero-headline"
           >
-            Next-Gen Websites
+            {t("hero.h1a")}
             <br />
-            That{" "}
+            {t("hero.h1b")}{" "}
             <span className="inline-block relative align-baseline">
               <AnimatePresence mode="wait">
                 <motion.span
-                  key={rotating[i]}
+                  key={rotatingKeys[i]}
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -30, opacity: 0 }}
                   transition={{ duration: 0.4 }}
                   className="gradient-text"
                 >
-                  {rotating[i]}
+                  {t(rotatingKeys[i])}
                 </motion.span>
               </AnimatePresence>
             </span>
             <br />
-            Your Business
+            {t("hero.h1c")}
           </motion.h1>
 
           <ComingSoonStrip />
@@ -84,9 +86,7 @@ export default function Hero() {
             className="mt-6 max-w-xl text-base sm:text-lg text-white/70 leading-relaxed"
             data-testid="hero-subheadline"
           >
-            Avero is a modern IT studio — starting with the fastest premium websites in India:
-            AI chatbots, SEO, hosting, maintenance & <span className="text-white font-semibold">48-hour delivery</span>.
-            Coming soon: AI marketing, ads & model fine-tuning for your business.
+            {t("hero.sub")}
           </motion.p>
 
           <motion.div
@@ -100,7 +100,7 @@ export default function Hero() {
               data-testid="hero-cta-primary"
               className="btn-glow rounded-full px-6 py-3.5 text-sm sm:text-base font-semibold inline-flex items-center gap-2 text-white"
             >
-              <Rocket className="w-4 h-4" /> Get Website in 48 Hours
+              <Rocket className="w-4 h-4" /> {t("hero.cta.primary")}
             </a>
             <a
               href={AVERO.whatsapp}
@@ -109,14 +109,14 @@ export default function Hero() {
               data-testid="hero-cta-whatsapp"
               className="btn-ghost rounded-full px-6 py-3.5 text-sm sm:text-base font-semibold inline-flex items-center gap-2"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-400" /> WhatsApp Now
+              <MessageCircle className="w-4 h-4 text-emerald-400" /> {t("hero.cta.whatsapp")}
             </a>
             <a
               href="#work"
               data-testid="hero-cta-demos"
               className="btn-ghost rounded-full px-6 py-3.5 text-sm sm:text-base font-semibold inline-flex items-center gap-2"
             >
-              <ArrowUpRight className="w-4 h-4 text-cyan-300" /> View Live Demos
+              <ArrowUpRight className="w-4 h-4 text-cyan-300" /> {t("hero.cta.demos")}
             </a>
           </motion.div>
 

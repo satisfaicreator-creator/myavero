@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Megaphone, Target, Brain, GraduationCap, Zap } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
-const futures = [
-  { icon: Megaphone,     label: "AI Marketing Suites",      tint: "text-cyan-300"    },
-  { icon: Target,        label: "AI Advertisement Engine",  tint: "text-fuchsia-300" },
-  { icon: Brain,         label: "Custom Model Fine-Tuning", tint: "text-purple-300"  },
-  { icon: GraduationCap, label: "Avero Academy · Trainings",tint: "text-emerald-300" },
+const futuresBase = [
+  { icon: Megaphone,     key: "cs.item1", tint: "text-cyan-300"    },
+  { icon: Target,        key: "cs.item2", tint: "text-fuchsia-300" },
+  { icon: Brain,         key: "cs.item3", tint: "text-purple-300"  },
+  { icon: GraduationCap, key: "cs.item4", tint: "text-emerald-300" },
 ];
 
 /**
@@ -14,13 +15,14 @@ const futures = [
  * Positions Avero as a broader AI IT studio — not just a web-dev shop.
  */
 export default function ComingSoonStrip() {
+  const { t } = useI18n();
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % futures.length), 2200);
-    return () => clearInterval(t);
+    const timer = setInterval(() => setI((x) => (x + 1) % futuresBase.length), 2200);
+    return () => clearInterval(timer);
   }, []);
 
-  const F = futures[i];
+  const F = futuresBase[i];
 
   return (
     <motion.div
@@ -43,7 +45,7 @@ export default function ComingSoonStrip() {
           <span className="absolute inset-0 rounded-full pulse-ring" />
           <div className="relative flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-[0_0_20px_rgba(236,72,153,0.5)]">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            Coming Soon
+            {t("cs.pill")}
           </div>
         </div>
 
@@ -51,7 +53,7 @@ export default function ComingSoonStrip() {
         <div className="relative flex-1 min-w-0 flex items-center gap-2">
           <AnimatePresence mode="wait">
             <motion.div
-              key={F.label}
+              key={F.key}
               initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -12, opacity: 0 }}
@@ -60,7 +62,7 @@ export default function ComingSoonStrip() {
             >
               <F.icon className={`w-4 h-4 shrink-0 ${F.tint}`} />
               <span className="font-heading font-semibold text-sm sm:text-[15px] truncate">
-                {F.label}
+                {t(F.key)}
               </span>
             </motion.div>
           </AnimatePresence>
@@ -69,13 +71,13 @@ export default function ComingSoonStrip() {
         {/* Right accent */}
         <div className="hidden sm:flex items-center gap-1 text-[10px] uppercase tracking-widest text-white/50 shrink-0">
           <Zap className="w-3 h-3 text-cyan-300" />
-          <span>2027 Roadmap</span>
+          <span>{t("cs.tag")}</span>
         </div>
       </div>
 
       {/* Micro caption */}
       <div className="mt-2 text-[11px] sm:text-xs text-white/50 leading-relaxed">
-        Websites today · <span className="text-white/80 font-semibold">an entire AI growth stack tomorrow</span>. Avero is quietly building the future — you get to be an early insider.
+        {t("cs.caption.a")}<span className="text-white/80 font-semibold">{t("cs.caption.b")}</span>{t("cs.caption.c")}
       </div>
     </motion.div>
   );

@@ -19,6 +19,7 @@ import jwt as pyjwt
 import resend
 
 from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+from seed_blog import BLOG_POSTS
 
 # ---------------- Setup ----------------
 ROOT_DIR = Path(__file__).parent
@@ -150,6 +151,16 @@ async def send_enquiry_email(e: Enquiry):
         logger.error(f"Resend send failed: {ex}")
 
 
+async def seed_blog():
+    for post in BLOG_POSTS:
+        await db.blog_posts.update_one(
+            {"slug": post["slug"]},
+            {"$set": post},
+            upsert=True,
+        )
+    logger.info(f"Seeded {len(BLOG_POSTS)} blog posts")
+
+
 # ---------------- Public routes ----------------
 @api.get("/")
 async def root():
@@ -163,6 +174,20 @@ async def create_enquiry(payload: EnquiryCreate):
     # fire-and-forget email
     asyncio.create_task(send_enquiry_email(obj))
     return obj
+
+
+@api.get("/blog")
+async def list_blog():
+    docs = await db.blog_posts.find({}, {"_id": 0, "body_html": 0}).sort("date", -1).to_list(50)
+    return docs
+
+
+@api.get("/blog/{slug}")
+async def get_blog(slug: str):
+    doc = await db.blog_posts.find_one({"slug": slug}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return doc
 
 
 # ---------------- Admin routes ----------------
@@ -285,6 +310,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def on_startup():
     await seed_admin()
+    await seed_blog()
 
 
 @app.on_event("shutdown")

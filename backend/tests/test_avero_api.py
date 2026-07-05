@@ -104,6 +104,54 @@ def test_admin_patch_enquiry_status(state):
     assert match and match[0]["status"] == "contacted"
 
 
+# -------- Blog --------
+def test_blog_list():
+    r = requests.get(f"{API}/blog", timeout=15)
+    assert r.status_code == 200
+    docs = r.json()
+    assert isinstance(docs, list)
+    slugs = {d.get("slug") for d in docs}
+    expected = {"wholesale-tea-3x-sales", "jaipur-salon-bookings", "ca-firm-lead-machine", "3d-ecommerce-storytelling"}
+    assert expected.issubset(slugs), f"missing slugs: {expected - slugs}"
+    # body_html excluded
+    for d in docs:
+        assert "body_html" not in d, "body_html should be excluded in list"
+        assert "title" in d and "excerpt" in d
+
+
+def test_blog_get_single():
+    r = requests.get(f"{API}/blog/wholesale-tea-3x-sales", timeout=15)
+    assert r.status_code == 200
+    doc = r.json()
+    assert doc["slug"] == "wholesale-tea-3x-sales"
+    assert "body_html" in doc and len(doc["body_html"]) > 0
+    assert "title" in doc
+
+
+def test_blog_get_unknown_returns_404():
+    r = requests.get(f"{API}/blog/does-not-exist-xyz", timeout=15)
+    assert r.status_code == 404
+
+
+# -------- SEO artifacts (served by frontend) --------
+def test_robots_txt():
+    r = requests.get(f"{BASE_URL}/robots.txt", timeout=15)
+    assert r.status_code == 200
+    body = r.text
+    assert "Disallow: /admin" in body
+    assert "Sitemap:" in body
+
+
+def test_sitemap_xml():
+    r = requests.get(f"{BASE_URL}/sitemap.xml", timeout=15)
+    assert r.status_code == 200
+    body = r.text
+    assert "<urlset" in body
+    for slug in ("wholesale-tea-3x-sales", "jaipur-salon-bookings", "ca-firm-lead-machine", "3d-ecommerce-storytelling"):
+        assert slug in body, f"sitemap missing slug {slug}"
+    assert "/blog" in body
+
+
 # -------- Chat SSE --------
 def test_chat_sse_stream():
     r = requests.post(
