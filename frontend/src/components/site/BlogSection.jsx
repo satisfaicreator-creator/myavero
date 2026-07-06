@@ -12,12 +12,15 @@ export default function BlogSection() {
 
   useEffect(() => {
     axios.get(`${API_BASE}/blog`)
-      .then((r) => setPosts(r.data.slice(0, 3)))
+      .then((r) => {
+        const data = Array.isArray(r.data) ? r.data : [];
+        setPosts(data.slice(0, 3));
+      })
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading || posts.length === 0) return null;
+  if (loading || !Array.isArray(posts) || posts.length === 0) return null;
 
   return (
     <section id="blog" className="relative py-20 sm:py-28" data-testid="blog-section">

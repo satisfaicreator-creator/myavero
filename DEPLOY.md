@@ -37,7 +37,7 @@ Commit the whole `/app` folder. Both `vercel.json` files are ready.
 
 ## Step 4 — Import into Vercel
 1. https://vercel.com/new → import your GitHub repo.
-2. **Root Directory** → set to `frontend`.
+2. **Root Directory** → **click Edit** → select `frontend`. ⚠️ **This is the single most common mistake — if you skip it, the API folder isn't detected and `/api/*` returns HTML, which crashes the site with `n.map is not a function` in console.**
 3. Framework Preset auto-detects **Create React App** from `vercel.json`.
 4. Click Deploy (will fail first time on missing env — expected).
 
@@ -59,6 +59,11 @@ Settings → Environment Variables → add these **8 vars** (apply to Production
 
 ## Step 6 — Redeploy
 Deployments → three-dot on last → Redeploy → uncheck build cache → Redeploy.
+
+### ⚠️ Vercel Deployment Protection (important gotcha)
+By default Vercel **blocks preview deployment URLs** (per-commit URLs like `myavero-binrshhfp-...vercel.app`) behind a Vercel login gate. If you open a preview URL and see a "Log in to Vercel" screen instead of the Avero site, that's why. Fix once:
+
+- Project → **Settings** → **Deployment Protection** → **Vercel Authentication** → set to **Disabled** (for a public marketing site) OR use only the stable production URL (`myavero.vercel.app`, assigned automatically to the `main` branch).
 
 ## Step 7 — Verify Everything
 - `https://YOUR-URL.vercel.app/` → landing page loads.

@@ -35,8 +35,8 @@ export default function AdminDashboard() {
         axios.get(`${API_BASE}/admin/enquiries`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get(`${API_BASE}/admin/stats`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      setEnquiries(e.data);
-      setStats(s.data);
+      setEnquiries(Array.isArray(e.data) ? e.data : []);
+      setStats(s.data && typeof s.data === "object" ? s.data : { total: 0, new: 0, contacted: 0, closed: 0 });
     } catch (err) {
       if (err?.response?.status === 401) {
         localStorage.removeItem("avero_admin_token");
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
     nav("/admin/login");
   };
 
-  const filtered = tab === "all" ? enquiries : enquiries.filter((e) => e.status === tab);
+  const filtered = tab === "all" ? enquiries : (Array.isArray(enquiries) ? enquiries.filter((e) => e.status === tab) : []);
 
   return (
     <div className="min-h-screen" data-testid="admin-dashboard">

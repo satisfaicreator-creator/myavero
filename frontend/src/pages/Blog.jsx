@@ -18,7 +18,7 @@ export default function Blog() {
   useEffect(() => {
     document.title = "Avero Blog | Case Studies · Insights · AI + Web";
     axios.get(`${API_BASE}/blog`)
-      .then((r) => setPosts(r.data))
+      .then((r) => setPosts(Array.isArray(r.data) ? r.data : []))
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));
   }, []);

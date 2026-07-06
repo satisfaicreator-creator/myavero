@@ -1,0 +1,29 @@
+{
+  "summary": "Regression + crash-resilience testing for Vercel deploy fix (n.map error). All defense-in-depth guards verified: BlogSection/Blog/AdminDashboard survive non-array API responses. Backend 18/18 pytest pass, frontend build clean, vercel.json regex verified for /api exclusion, DEPLOY.md carries root-directory warning.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": ["/app/backend/tests/test_avero_api.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "All fixes are correct defense-in-depth. Root cause of the Vercel bug (Root Directory not set to frontend/) is a deployment-config issue that must be resolved in Vercel dashboard — code cannot fix it, only prevent the crash. DEPLOY.md Step 4 already flags this loudly."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@theavero.dev / Avero@2999 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "None — used existing seeded blog posts + admin.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Playwright route mocking used to inject non-array responses into /api/blog (HTML string, 404 JSON) and /api/admin/enquiries + /api/admin/stats (object, string). BlogSection returns null gracefully; Blog page shows 'No posts yet' empty state; AdminDashboard shows zero stats + empty enquiries. No pageerror emitted in any scenario. vercel.json regex '^/((?!api/|api$|_next/|.*\\..*|admin/api).*)$' verified against 9 URL patterns — /api, /api/, /api/blog, /api/admin/enquiries all NOT rewritten; /admin/login, /blog/<slug>, / are REWRITTEN; /robots.txt, /sitemap.xml NOT rewritten.",
+  "verification_matrix": {
+    "landing_normal_render": "PASS (3 blog cards)",
+    "landing_api_returns_html_string": "PASS (BlogSection hidden, page intact)",
+    "landing_api_returns_404_object": "PASS (BlogSection hidden, page intact)",
+    "blog_page_broken_api": "PASS (empty state shown)",
+    "admin_login": "PASS",
+    "admin_dashboard_non_array_responses": "PASS (zero stats + empty state)",
+    "vercel_regex_api_exclusion": "PASS (all /api* NOT rewritten)",
+    "deploy_md_warning": "PASS (Step 4 bold warning present)",
+    "yarn_build": "PASS",
+    "backend_pytest": "18/18 PASS"
+  }
+}
