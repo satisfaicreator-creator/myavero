@@ -9,8 +9,6 @@ const NAV_KEYS = [
   { label: "nav.home",     href: "/#home" },
   { label: "nav.services", href: "/#services" },
   { label: "nav.work",     href: "/#work" },
-  { label: "nav.threeD",   href: "/#three-d" },
-  { label: "nav.process",  href: "/#process" },
   { label: "nav.pricing",  href: "/#pricing" },
   { label: "nav.why",      href: "/#why" },
   { label: "nav.blog",     href: "/blog" },
@@ -35,18 +33,18 @@ export default function Header() {
         scrolled ? "glass-strong" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20">
-        <a href="#home" className="flex items-center" aria-label="Avero home">
-          <AveroLogo />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 h-16 sm:h-20">
+        <a href="#home" className="flex items-center shrink-0" aria-label="Avero home">
+          <AveroLogo compact />
         </a>
 
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
           {NAV_KEYS.map((n) => (
             <a
               key={n.href}
               href={n.href}
               data-testid={`nav-${n.label.split(".")[1]}`}
-              className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors relative group"
+              className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors relative group whitespace-nowrap"
             >
               {t(n.label)}
               <span className="absolute left-3 right-3 -bottom-0.5 h-px bg-gradient-to-r from-cyan-400 to-fuchsia-400 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -54,22 +52,22 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2 shrink-0">
           <LanguageToggle />
           <a
             href={AVERO.whatsapp}
             target="_blank"
             rel="noreferrer"
             data-testid="header-whatsapp-btn"
-            className="btn-ghost rounded-full px-4 py-2 text-sm inline-flex items-center gap-2"
+            className="btn-ghost rounded-full px-3 py-2 text-sm inline-flex items-center gap-1.5 whitespace-nowrap"
           >
             <MessageCircle className="w-4 h-4 text-emerald-400" />
-            {t("cta.whatsapp")}
+            <span className="hidden xl:inline">{t("cta.whatsapp")}</span>
           </a>
           <a
             href="/#contact"
             data-testid="header-start-project-btn"
-            className="btn-glow rounded-full px-4 py-2 text-sm font-semibold inline-flex items-center gap-2 text-white"
+            className="btn-glow rounded-full px-4 py-2 text-sm font-semibold inline-flex items-center gap-1.5 text-white whitespace-nowrap"
           >
             <Rocket className="w-4 h-4" /> {t("cta.startProject")}
           </a>
@@ -77,7 +75,7 @@ export default function Header() {
 
         <button
           onClick={() => setOpen(!open)}
-          className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/10"
+          className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/10 shrink-0"
           aria-label="Open menu"
           data-testid="mobile-menu-toggle"
         >

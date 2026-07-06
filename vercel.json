@@ -4,7 +4,8 @@
   "buildCommand": "cd frontend && yarn install && yarn build",
   "installCommand": "cd frontend && yarn install",
   "outputDirectory": "frontend/build",
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/((?!api|.*\\..*).*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

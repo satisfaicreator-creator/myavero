@@ -1,7 +1,7 @@
-export default function AveroLogo({ size = 40, showText = true }) {
+export default function AveroLogo({ size = 40, showText = true, compact = false }) {
   return (
-    <div className="flex items-center gap-3 select-none" data-testid="avero-logo">
-      <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden>
+    <div className="flex items-center gap-2.5 select-none" data-testid="avero-logo">
+      <svg width={compact ? 34 : size} height={compact ? 34 : size} viewBox="0 0 64 64" fill="none" aria-hidden>
         <defs>
           <linearGradient id="averoGrad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#22D3EE" />
@@ -16,10 +16,12 @@ export default function AveroLogo({ size = 40, showText = true }) {
       </svg>
       {showText && (
         <div className="leading-none">
-          <div className="font-heading font-extrabold text-2xl tracking-tight">avero</div>
-          <div className="text-[10px] uppercase tracking-[0.22em] text-white/60">
-            We <span className="text-cyan-300">Design.</span> You <span className="text-fuchsia-400">Grow.</span>
-          </div>
+          <div className={`font-heading font-extrabold tracking-tight ${compact ? "text-xl" : "text-2xl"}`}>avero</div>
+          {!compact && (
+            <div className="text-[10px] uppercase tracking-[0.22em] text-white/60 mt-1">
+              We <span className="text-cyan-300">Design.</span> You <span className="text-fuchsia-400">Grow.</span>
+            </div>
+          )}
         </div>
       )}
     </div>

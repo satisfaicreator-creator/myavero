@@ -1,12 +1,10 @@
-const items = [
-  "Launch Offer — Premium Website Starting at ₹2,999",
-  "Website Delivery in 48 Hours",
-  "Free Domain + Hosting Setup Available",
-  "AI Chatbot + SEO-Ready Websites",
-  "Trusted by Local Businesses, Salons, CA Firms & Ecommerce Brands",
-];
+import { useSettings } from "@/lib/settings";
 
 export default function AnnouncementBar() {
+  const { settings } = useSettings();
+  const items = (settings.announcement_items && settings.announcement_items.length)
+    ? settings.announcement_items
+    : ["Website Delivery in 48 Hours"];
   const loop = [...items, ...items];
   return (
     <div

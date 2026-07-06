@@ -7,21 +7,24 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import { I18nProvider } from "@/lib/i18n";
+import { SettingsProvider } from "@/lib/settings";
 
 function App() {
   return (
     <div className="App">
       <I18nProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </BrowserRouter>
-        <Toaster position="top-right" theme="dark" />
+        <SettingsProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Routes>
+          </BrowserRouter>
+          <Toaster position="top-right" theme="dark" />
+        </SettingsProvider>
       </I18nProvider>
     </div>
   );

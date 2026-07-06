@@ -4,8 +4,8 @@
   "buildCommand": "yarn build",
   "installCommand": "yarn install",
   "outputDirectory": "build",
-  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/((?!api/|api$|_next/|.*\\..*|admin/api).*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

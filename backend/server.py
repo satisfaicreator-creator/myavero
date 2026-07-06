@@ -78,6 +78,41 @@ class ChatIn(BaseModel):
     message: str
 
 
+class SiteSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    starting_price: str = "₹2,999"
+    original_price: str = "₹15,000"
+    save_percent: int = 80
+    slots_left: int = 6
+    delivery: str = "48 Hours"
+    offer_title: str = "Complete Business Website Package"
+    offer_tagline: str = "Everything a modern business needs to look premium online — design, dev, hosting, SEO, AI chatbot & 48-hour delivery."
+    guarantee_note: str = "100% money-back if we miss 48H*"
+    announcement_items: List[str] = Field(default_factory=lambda: [
+        "Launch Offer — Premium Website Starting at ₹2,999",
+        "Website Delivery in 48 Hours",
+        "Free Domain + Hosting Setup Available",
+        "AI Chatbot + SEO-Ready Websites",
+        "Trusted by Local Businesses, Salons, CA Firms & Ecommerce Brands",
+    ])
+    features: List[str] = Field(default_factory=lambda: [
+        "Website Delivery in 48 Hours",
+        "Premium Custom Design",
+        "Mobile Responsive",
+        "SEO Setup + Meta Tags",
+        "AI Chatbot Integration",
+        "WhatsApp & Call CTAs",
+        "Lead Enquiry Forms",
+        "Hosting Setup + SSL",
+        "Domain Setup Assistance",
+        "Secure & Fast",
+        "Google Analytics Ready",
+        "1-Month Maintenance",
+        "Priority Support",
+        "Launch-Day Assistance",
+    ])
+
+
 # ---------------- Auth ----------------
 def make_token(email: str) -> str:
     payload = {"sub": email, "role": "admin", "exp": datetime.now(timezone.utc) + timedelta(days=7)}
@@ -160,6 +195,23 @@ async def seed_blog():
     logger.info(f"Seeded {len(BLOG_POSTS)} blog posts")
 
 
+async def seed_settings():
+    existing = await db.settings.find_one({"key": "site"}, {"_id": 0})
+    if existing:
+        return
+    defaults = SiteSettings().model_dump()
+    await db.settings.insert_one({"key": "site", **defaults, "updated_at": datetime.now(timezone.utc).isoformat()})
+    logger.info("Seeded default site settings")
+
+
+async def get_settings_doc() -> dict:
+    doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
+    if not doc:
+        await seed_settings()
+        doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
+    return doc or SiteSettings().model_dump()
+
+
 # ---------------- Public routes ----------------
 @api.get("/")
 async def root():
@@ -187,6 +239,11 @@ async def get_blog(slug: str):
     if not doc:
         raise HTTPException(status_code=404, detail="Post not found")
     return doc
+
+
+@api.get("/settings")
+async def public_settings():
+    return await get_settings_doc()
 
 
 # ---------------- Admin routes ----------------
@@ -222,6 +279,20 @@ async def admin_stats(_: dict = Depends(require_admin)):
     contacted = await db.enquiries.count_documents({"status": "contacted"})
     closed = await db.enquiries.count_documents({"status": "closed"})
     return {"total": total, "new": new_count, "contacted": contacted, "closed": closed}
+
+
+@api.get("/admin/settings")
+async def admin_get_settings(_: dict = Depends(require_admin)):
+    return await get_settings_doc()
+
+
+@api.put("/admin/settings")
+async def admin_update_settings(payload: SiteSettings, _: dict = Depends(require_admin)):
+    data = payload.model_dump()
+    data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.settings.update_one({"key": "site"}, {"$set": data}, upsert=True)
+    doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
+    return doc
 
 
 # ---------------- Chatbot (SSE stream, rule-based — no external API cost) ----------------

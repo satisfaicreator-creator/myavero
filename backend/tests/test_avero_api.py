@@ -104,6 +104,48 @@ def test_admin_patch_enquiry_status(state):
     assert match and match[0]["status"] == "contacted"
 
 
+# -------- Settings --------
+def test_public_settings_no_auth():
+    r = requests.get(f"{API}/settings", timeout=15)
+    assert r.status_code == 200
+    d = r.json()
+    for k in ("starting_price", "delivery", "announcement_items", "features"):
+        assert k in d, f"missing {k}"
+    assert isinstance(d["announcement_items"], list) and len(d["announcement_items"]) >= 1
+    assert isinstance(d["features"], list) and len(d["features"]) >= 1
+    assert d["starting_price"]  # non-empty
+
+
+def test_admin_settings_requires_auth():
+    r = requests.get(f"{API}/admin/settings", timeout=15)
+    assert r.status_code == 401
+
+
+def test_admin_update_settings_roundtrip(state):
+    token = state["token"]
+    headers = {"Authorization": f"Bearer {token}"}
+    # get current
+    r = requests.get(f"{API}/admin/settings", headers=headers, timeout=15)
+    assert r.status_code == 200
+    original = r.json()
+    # update
+    new_payload = {**original, "starting_price": "₹4,999",
+                   "announcement_items": original["announcement_items"] + ["TEST announcement item"]}
+    r2 = requests.put(f"{API}/admin/settings", json=new_payload, headers=headers, timeout=15)
+    assert r2.status_code == 200, r2.text
+    assert r2.json()["starting_price"] == "₹4,999"
+    # public reflects update
+    r3 = requests.get(f"{API}/settings", timeout=15)
+    assert r3.json()["starting_price"] == "₹4,999"
+    assert "TEST announcement item" in r3.json()["announcement_items"]
+    # restore
+    r4 = requests.put(f"{API}/admin/settings",
+                      json={**original, "starting_price": "₹2,999"},
+                      headers=headers, timeout=15)
+    assert r4.status_code == 200
+    assert r4.json()["starting_price"] == "₹2,999"
+
+
 # -------- Blog --------
 def test_blog_list():
     r = requests.get(f"{API}/blog", timeout=15)
