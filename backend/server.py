@@ -135,16 +135,26 @@ async def seed_admin():
     if not ADMIN_EMAIL_DEFAULT or not ADMIN_PASSWORD_DEFAULT:
         return
     existing = await db.admins.find_one({"email": ADMIN_EMAIL_DEFAULT}, {"_id": 0})
-    if existing:
-        return
-    hashed = bcrypt.hashpw(ADMIN_PASSWORD_DEFAULT.encode(), bcrypt.gensalt()).decode()
-    await db.admins.insert_one({
-        "id": str(uuid.uuid4()),
-        "email": ADMIN_EMAIL_DEFAULT,
-        "password_hash": hashed,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
-    logger.info(f"Seeded admin: {ADMIN_EMAIL_DEFAULT}")
+    if not existing:
+        hashed = bcrypt.hashpw(ADMIN_PASSWORD_DEFAULT.encode(), bcrypt.gensalt()).decode()
+        await db.admins.insert_one({
+            "id": str(uuid.uuid4()),
+            "email": ADMIN_EMAIL_DEFAULT,
+            "password_hash": hashed,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        logger.info(f"Seeded admin: {ADMIN_EMAIL_DEFAULT}")
+    else:
+        # Rotate password on env-var change
+        if not bcrypt.checkpw(ADMIN_PASSWORD_DEFAULT.encode(), existing["password_hash"].encode()):
+            hashed = bcrypt.hashpw(ADMIN_PASSWORD_DEFAULT.encode(), bcrypt.gensalt()).decode()
+            await db.admins.update_one(
+                {"email": ADMIN_EMAIL_DEFAULT},
+                {"$set": {"password_hash": hashed, "updated_at": datetime.now(timezone.utc).isoformat()}},
+            )
+            logger.info(f"Rotated admin password for {ADMIN_EMAIL_DEFAULT}")
+    # Remove any stale admins whose email no longer matches
+    await db.admins.delete_many({"email": {"$ne": ADMIN_EMAIL_DEFAULT}})
 
 
 # ---------------- Email ----------------

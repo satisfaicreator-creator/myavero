@@ -33,7 +33,7 @@ export async function ensureSeeded() {
     const { BLOG_POSTS } = await import("./blog-data.js");
     const db = await getDb();
 
-    // Admin
+    // Admin — idempotent: upsert on ADMIN_EMAIL, refresh password if it changed
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (adminEmail && adminPassword) {
@@ -45,7 +45,20 @@ export async function ensureSeeded() {
           created_at: new Date().toISOString(),
         });
         console.log("[avero] Seeded admin", adminEmail);
+      } else {
+        // Rotate password when env var changes
+        const match = await bcrypt.compare(adminPassword, existing.password_hash);
+        if (!match) {
+          const password_hash = await bcrypt.hash(adminPassword, 10);
+          await db.collection("admins").updateOne(
+            { email: adminEmail },
+            { $set: { password_hash, updated_at: new Date().toISOString() } }
+          );
+          console.log("[avero] Rotated admin password for", adminEmail);
+        }
       }
+      // Remove stale admin accounts that no longer match the current ADMIN_EMAIL
+      await db.collection("admins").deleteMany({ email: { $ne: adminEmail } });
     }
 
     // Blog
