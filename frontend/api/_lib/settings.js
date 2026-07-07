@@ -32,18 +32,52 @@ export const DEFAULT_SETTINGS = {
     "Priority Support",
     "Launch-Day Assistance",
   ],
+  sections: {
+    announcement: true,
+    meme: true,
+    problem: true,
+    services: true,
+    laptop3d: true,
+    delivery: true,
+    portfolio: true,
+    threed_showcase: true,
+    industries: true,
+    pricing: true,
+    why: true,
+    before_after: true,
+    lead_gen: true,
+    ai: true,
+    roadmap: true,
+    blog: true,
+    faq: true,
+    chatbot: true,
+    mobile_cta: true,
+  },
 };
 
 export async function getSettings() {
   const db = await getDb();
   const doc = await db.collection("settings").findOne({ key: "site" }, { projection: { _id: 0, key: 0 } });
-  if (doc) return { ...DEFAULT_SETTINGS, ...doc };
-  await db.collection("settings").insertOne({
-    key: "site",
-    ...DEFAULT_SETTINGS,
-    updated_at: new Date().toISOString(),
-  });
-  return DEFAULT_SETTINGS;
+  if (!doc) {
+    await db.collection("settings").insertOne({
+      key: "site",
+      ...DEFAULT_SETTINGS,
+      updated_at: new Date().toISOString(),
+    });
+    return { ...DEFAULT_SETTINGS };
+  }
+  // Backfill defaults for any missing top-level keys (e.g. `sections` added later)
+  const merged = { ...DEFAULT_SETTINGS };
+  for (const [k, v] of Object.entries(doc)) {
+    if (v !== null && v !== undefined) merged[k] = v;
+  }
+  // Backfill nested section flags too
+  if (merged.sections && typeof merged.sections === "object") {
+    merged.sections = { ...DEFAULT_SETTINGS.sections, ...merged.sections };
+  } else {
+    merged.sections = { ...DEFAULT_SETTINGS.sections };
+  }
+  return merged;
 }
 
 export async function updateSettings(payload) {

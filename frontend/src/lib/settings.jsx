@@ -34,6 +34,27 @@ export const DEFAULT_SETTINGS = {
     "Priority Support",
     "Launch-Day Assistance",
   ],
+  sections: {
+    announcement: true,
+    meme: true,
+    problem: true,
+    services: true,
+    laptop3d: true,
+    delivery: true,
+    portfolio: true,
+    threed_showcase: true,
+    industries: true,
+    pricing: true,
+    why: true,
+    before_after: true,
+    lead_gen: true,
+    ai: true,
+    roadmap: true,
+    blog: true,
+    faq: true,
+    chatbot: true,
+    mobile_cta: true,
+  },
 };
 
 const SettingsContext = createContext({ settings: DEFAULT_SETTINGS, loading: true, refresh: () => {} });

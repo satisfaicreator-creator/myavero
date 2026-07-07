@@ -22,8 +22,13 @@ import FAQ from "@/components/site/FAQ";
 import Footer from "@/components/site/Footer";
 import MobileCTA from "@/components/site/MobileCTA";
 import Chatbot from "@/components/site/Chatbot";
+import { useSettings } from "@/lib/settings";
 
 export default function Landing() {
+  const { settings } = useSettings();
+  const s = settings.sections || {};
+  const on = (k) => s[k] !== false;
+
   useEffect(() => {
     document.title = "Avero | Premium Websites in 48 Hours · Starting ₹2,999";
     const setMeta = (name, content) => {
@@ -172,31 +177,31 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden" data-testid="landing-page">
-      <AnnouncementBar />
+      {on("announcement") && <AnnouncementBar />}
       <Header />
       <main>
         <Hero />
-        <MemeSection />
-        <ProblemSection />
-        <Services />
-        <Laptop3D />
-        <Delivery />
-        <Portfolio />
-        <ThreeDShowcase />
-        <Industries />
-        <Pricing />
-        <WhyAvero />
-        <BeforeAfter />
-        <LeadGen />
-        <AISection />
-        <Roadmap />
-        <BlogSection />
+        {on("meme") && <MemeSection />}
+        {on("problem") && <ProblemSection />}
+        {on("services") && <Services />}
+        {on("laptop3d") && <Laptop3D />}
+        {on("delivery") && <Delivery />}
+        {on("portfolio") && <Portfolio />}
+        {on("threed_showcase") && <ThreeDShowcase />}
+        {on("industries") && <Industries />}
+        {on("pricing") && <Pricing />}
+        {on("why") && <WhyAvero />}
+        {on("before_after") && <BeforeAfter />}
+        {on("lead_gen") && <LeadGen />}
+        {on("ai") && <AISection />}
+        {on("roadmap") && <Roadmap />}
+        {on("blog") && <BlogSection />}
         <ContactForm />
-        <FAQ />
+        {on("faq") && <FAQ />}
       </main>
       <Footer />
-      <MobileCTA />
-      <Chatbot />
+      {on("mobile_cta") && <MobileCTA />}
+      {on("chatbot") && <Chatbot />}
     </div>
   );
 }

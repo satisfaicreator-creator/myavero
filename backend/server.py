@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import os
@@ -111,6 +111,27 @@ class SiteSettings(BaseModel):
         "Priority Support",
         "Launch-Day Assistance",
     ])
+    sections: Dict[str, bool] = Field(default_factory=lambda: {
+        "announcement": True,
+        "meme": True,
+        "problem": True,
+        "services": True,
+        "laptop3d": True,
+        "delivery": True,
+        "portfolio": True,
+        "threed_showcase": True,
+        "industries": True,
+        "pricing": True,
+        "why": True,
+        "before_after": True,
+        "lead_gen": True,
+        "ai": True,
+        "roadmap": True,
+        "blog": True,
+        "faq": True,
+        "chatbot": True,
+        "mobile_cta": True,
+    })
 
 
 # ---------------- Auth ----------------
@@ -215,11 +236,17 @@ async def seed_settings():
 
 
 async def get_settings_doc() -> dict:
+    defaults = SiteSettings().model_dump()
     doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
     if not doc:
         await seed_settings()
-        doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
-    return doc or SiteSettings().model_dump()
+        doc = await db.settings.find_one({"key": "site"}, {"_id": 0, "key": 0}) or {}
+    # Backfill any missing keys with defaults so old docs get new fields (e.g. `sections`) for free
+    merged = {**defaults, **{k: v for k, v in (doc or {}).items() if v is not None}}
+    # If nested `sections` doc is missing keys added later, top them up too
+    if isinstance(merged.get("sections"), dict):
+        merged["sections"] = {**defaults["sections"], **merged["sections"]}
+    return merged
 
 
 # ---------------- Public routes ----------------
