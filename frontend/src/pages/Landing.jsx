@@ -71,7 +71,7 @@ export default function Landing() {
       "url": "https://theavero.dev",
       "logo": "https://theavero.dev/og-cover.jpg",
       "slogan": "We Design. You Grow.",
-      "email": "satisfaicreator@gmail.com",
+      "email": "contact@theavero.dev",
       "telephone": "+91-9680816234",
       "sameAs": []
     });
@@ -93,7 +93,7 @@ export default function Landing() {
       "name": "Avero",
       "slogan": "We Design. You Grow.",
       "url": "https://theavero.dev",
-      "email": "satisfaicreator@gmail.com",
+      "email": "contact@theavero.dev",
       "telephone": "+91-9680816234",
       "priceRange": "₹₹",
       "areaServed": "IN",
@@ -134,7 +134,7 @@ export default function Landing() {
       "image": "https://theavero.dev/og-cover.jpg",
       "url": "https://theavero.dev",
       "telephone": "+91-9680816234",
-      "email": "satisfaicreator@gmail.com",
+      "email": "contact@theavero.dev",
       "priceRange": "₹₹",
       "address": {
         "@type": "PostalAddress",

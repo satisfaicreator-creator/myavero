@@ -38,7 +38,7 @@ const RULES = [
   },
   {
     keys: ["contact", "whatsapp", "phone", "call", "email", "reach"],
-    reply: "Fastest way: WhatsApp +91-9680816234. Email: satisfaicreator@gmail.com. Or scroll to the Contact section on this page and fill the enquiry form — we usually reply within an hour."
+    reply: "Fastest way: WhatsApp +91-9680816234. Email: contact@theavero.dev. Or scroll to the Contact section on this page and fill the enquiry form — we usually reply within an hour."
   },
   {
     keys: ["business", "startup", "shop", "cafe", "salon", "ca ", "restaurant", "clinic", "doctor", "wholesale", "portfolio"],

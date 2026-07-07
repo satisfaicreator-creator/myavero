@@ -5,7 +5,7 @@ export const AVERO = {
   name: "Avero",
   tagline: "We Design. You Grow.",
   website: "https://theavero.dev",
-  email: "satisfaicreator@gmail.com",
+  email: "contact@theavero.dev",
   phone: "+91-9680816234",
   phoneRaw: "919680816234",
   whatsapp: "https://wa.me/919680816234",

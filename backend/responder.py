@@ -18,7 +18,7 @@ RULES = [
     (["ai marketing", "ai ads", "advertisement", "fine-tuning", "fine tuning", "training", "academy"],
      "Great question! AI Marketing Suites, AI Advertisement, Custom Model Fine-Tuning and Avero Academy trainings are on our 2027 roadmap. Reserve early access by dropping your email in the contact form or WhatsApp us — you'll be first in line."),
     (["contact", "whatsapp", "phone", "call", "email", "reach"],
-     "Fastest way: WhatsApp +91-9680816234. Email: satisfaicreator@gmail.com. Or scroll to the Contact section on this page and fill the enquiry form — we usually reply within an hour."),
+     "Fastest way: WhatsApp +91-9680816234. Email: contact@theavero.dev. Or scroll to the Contact section on this page and fill the enquiry form — we usually reply within an hour."),
     (["business", "startup", "cafe", "salon", "ca ", "restaurant", "clinic", "doctor", "wholesale", "portfolio"],
      "We build for exactly this. Local businesses, salons, cafes, CAs, doctors, wholesalers, ecommerce brands and startups all get their own tailored template. WhatsApp us with your business type on +91-9680816234 and we'll share a matching demo."),
     (["timeline", "how long", "duration", "when"],
