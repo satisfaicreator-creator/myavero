@@ -5,8 +5,8 @@
  */
 const RULES = [
   {
-    keys: ["price", "cost", "pricing", "2999", "₹2,999", "how much", "kitna", "kharcha"],
-    reply: "Our Mega Launch Offer starts at ₹2,999 — everything included: design, development, hosting setup, SSL, SEO, AI-style chatbot, WhatsApp CTAs, enquiry forms, 1-month maintenance and 48-hour delivery. Final cost depends on pages, ecommerce, 3D or admin panel needs. Want a quick quote? WhatsApp us on +91-9680816234 with your business type."
+    keys: ["price", "cost", "pricing", "3999", "₹3,999", "how much", "kitna", "kharcha"],
+    reply: "Our Mega Launch Offer starts at ₹3,999 — everything included: design, development, hosting setup, SSL, SEO, AI-style chatbot, WhatsApp CTAs, enquiry forms, 1-month maintenance and 48-hour delivery. Final cost depends on pages, ecommerce, 3D or admin panel needs. Want a quick quote? WhatsApp us on +91-9680816234 with your business type."
   },
   {
     keys: ["48", "hour", "delivery", "fast", "quick", "jaldi", "turnaround"],
