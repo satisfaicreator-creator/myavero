@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Save, Plus, Trash2, RotateCcw, Eye, EyeOff } from "lucide-react";
+import { Save, Plus, Trash2, RotateCcw, Eye, EyeOff, GripVertical } from "lucide-react";
 import { API_BASE } from "@/lib/config";
 import { DEFAULT_SETTINGS, useSettings } from "@/lib/settings";
 
 // Human-readable labels + optional descriptions for section toggles
 const SECTION_META = [
   { key: "announcement",    label: "Announcement Bar",         desc: "Scrolling marquee at very top" },
+  { key: "hero",            label: "Hero Section",             desc: "Top intro and CTA block" },
   { key: "meme",            label: "Meme Section",             desc: "Viral before/after character strip" },
   { key: "problem",         label: "Problem Section",          desc: "'Your business is good…' block" },
   { key: "services",        label: "Services",                 desc: "What Avero offers" },
@@ -17,6 +18,7 @@ const SECTION_META = [
   { key: "threed_showcase", label: "3D Sites Showcase",        desc: "Cinematic 3D examples" },
   { key: "industries",      label: "Industries",               desc: "Salons, CAs, ecommerce…" },
   { key: "pricing",         label: "Pricing (Mega Offer)",     desc: "₹3,999 offer card" },
+  { key: "featured_products", label: "Featured Products",      desc: "Showcase product cards like 35L Pipeline" },
   { key: "why",             label: "Why Avero",                desc: "Value props / trust badges" },
   { key: "before_after",    label: "Before / After",           desc: "Comparison slider" },
   { key: "lead_gen",        label: "Lead Gen Strip",           desc: "Mid-page conversion nudge" },
@@ -33,6 +35,7 @@ export default function SettingsPanel({ token }) {
   const [form, setForm] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [draggedKey, setDraggedKey] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -74,6 +77,19 @@ export default function SettingsPanel({ token }) {
     return { ...f, sections: next };
   });
 
+  const moveSection = (fromKey, toKey) => {
+    setForm((f) => {
+      const currentOrder = [...(f.section_order || SECTION_META.map((m) => m.key))];
+      const fromIndex = currentOrder.indexOf(fromKey);
+      const toIndex = currentOrder.indexOf(toKey);
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return f;
+      const nextOrder = [...currentOrder];
+      const [moved] = nextOrder.splice(fromIndex, 1);
+      nextOrder.splice(toIndex, 0, moved);
+      return { ...f, section_order: nextOrder };
+    });
+  };
+
   const save = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -85,6 +101,7 @@ export default function SettingsPanel({ token }) {
         announcement_items: (form.announcement_items || []).filter((s) => s && s.trim()),
         features: (form.features || []).filter((s) => s && s.trim()),
         sections: form.sections || DEFAULT_SETTINGS.sections,
+        section_order: (form.section_order || DEFAULT_SETTINGS.section_order || SECTION_META.map((m) => m.key)).filter((k) => SECTION_META.some((m) => m.key === k)),
       };
       const { data } = await axios.put(`${API_BASE}/admin/settings`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -168,7 +185,8 @@ export default function SettingsPanel({ token }) {
           </div>
         </header>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-4">
-          {SECTION_META.map((m) => {
+          {(form.section_order || SECTION_META.map((m) => m.key)).map((key) => {
+            const m = SECTION_META.find((item) => item.key === key) || SECTION_META.find((item) => item.key === "hero") || SECTION_META[0];
             const enabled = form.sections?.[m.key] !== false;
             return (
               <label
@@ -178,6 +196,15 @@ export default function SettingsPanel({ token }) {
                   enabled ? "ring-1 ring-cyan-400/30" : "opacity-60"
                 }`}
                 data-testid={`section-toggle-row-${m.key}`}
+                draggable
+                onDragStart={() => setDraggedKey(m.key)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => {
+                  if (draggedKey && draggedKey !== m.key) {
+                    moveSection(draggedKey, m.key);
+                  }
+                  setDraggedKey(null);
+                }}
               >
                 <button
                   type="button"
@@ -199,6 +226,9 @@ export default function SettingsPanel({ token }) {
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold text-white">{m.label}</div>
                   {m.desc && <div className="text-[11px] text-white/50 mt-0.5">{m.desc}</div>}
+                </div>
+                <div className="ml-auto mt-0.5 text-white/35 cursor-grab" title="Drag to reorder">
+                  <GripVertical className="w-4 h-4" />
                 </div>
               </label>
             );
