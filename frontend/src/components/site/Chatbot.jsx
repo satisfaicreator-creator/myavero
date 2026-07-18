@@ -7,7 +7,7 @@ const initialMessages = [
 ];
 
 const quickPrompts = [
-  "What's included in ₹2,999?",
+  "What's included in ₹3,999?",
   "How does 48-hour delivery work?",
   "Do you build 3D websites?",
   "Can you set up an AI chatbot for me?",

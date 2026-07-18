@@ -53,7 +53,7 @@ Settings → Environment Variables → add these **8 vars** (apply to Production
 | `ADMIN_RECIPIENT_EMAIL` | `satisfaicreator@gmail.com` | Your inbox |
 | `JWT_SECRET` | 32+ char random string — run `openssl rand -hex 32` | Any |
 | `ADMIN_EMAIL` | `admin@theavero.dev` | Auto-seeded on first API call |
-| `ADMIN_PASSWORD` | strong password (change from `Avero@2999`) | Auto-seeded |
+| `ADMIN_PASSWORD` | strong password (change from `Avero@3999`) | Auto-seeded |
 
 **Do NOT set `REACT_APP_BACKEND_URL`** — leaving it empty makes the frontend call same-origin `/api/*`, which is what we want.
 

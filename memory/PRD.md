@@ -1,7 +1,7 @@
 # Avero — PRD
 
 ## Original problem statement
-Build a complete, production-ready, ultra-modern website for Avero, a premium web design & development company. Tagline "We Design. You Grow." 48-hour delivery, starting ₹2,999. Dark futuristic neon-tech theme. Convert visitors into WhatsApp / call / form leads. Position Avero as a modern IT studio expanding into AI marketing, AI ads, model fine-tuning and trainings.
+Build a complete, production-ready, ultra-modern website for Avero, a premium web design & development company. Tagline "We Design. You Grow." 48-hour delivery, starting ₹3,999. Dark futuristic neon-tech theme. Convert visitors into WhatsApp / call / form leads. Position Avero as a modern IT studio expanding into AI marketing, AI ads, model fine-tuning and trainings.
 
 ## Approved architecture
 - React 19 (CRA + craco) + Tailwind + shadcn/ui + Framer Motion (hybrid CSS 3D scene)
@@ -31,7 +31,7 @@ Build a complete, production-ready, ultra-modern website for Avero, a premium we
 Landing (16 sections), AI chatbot (SSE), Admin login/dashboard, Resend emails, SEO meta + basic JSON-LD.
 
 ### Iteration 2
-Hero "Coming Soon" strip with rotating AI stack, viral MemeSection (before/after slider + SVG characters), Laptop3D (3 content tabs), Roadmap section, single ₹2,999 Mega Offer, portfolio real screenshots (mshots), positioning to "modern IT studio".
+Hero "Coming Soon" strip with rotating AI stack, viral MemeSection (before/after slider + SVG characters), Laptop3D (3 content tabs), Roadmap section, single ₹3,999 Mega Offer, portfolio real screenshots (mshots), positioning to "modern IT studio".
 
 ### Iteration 3
 - Blog / Case Studies: `/blog`, `/blog/:slug`, landing preview section, 4 seeded case studies with body_html + mshots covers.

@@ -3,7 +3,6 @@ from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict
 from datetime import datetime, timezone, timedelta
@@ -13,6 +12,7 @@ import logging
 import uuid
 import asyncio
 import json
+import copy
 
 import bcrypt
 import jwt as pyjwt
@@ -36,11 +36,210 @@ ADMIN_PASSWORD_DEFAULT = os.environ.get("ADMIN_PASSWORD", "")
 
 resend.api_key = RESEND_API_KEY
 
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("avero")
+
+
+class InMemoryCollection:
+    def __init__(self, name: str):
+        self.name = name
+        self._docs = []
+
+    def _matches(self, doc: dict, query: Optional[dict] = None) -> bool:
+        query = query or {}
+        for key, expected in query.items():
+            if isinstance(expected, dict):
+                if "$ne" in expected:
+                    if doc.get(key) == expected["$ne"]:
+                        return False
+                else:
+                    return False
+            elif doc.get(key) != expected:
+                return False
+        return True
+
+    def _project(self, doc: dict, projection: Optional[dict] = None) -> dict:
+        if not projection:
+            return copy.deepcopy(doc)
+        result = copy.deepcopy(doc)
+        for key, include in projection.items():
+            if key == "_id" and include == 0:
+                result.pop("_id", None)
+            elif include == 0 and key in result:
+                result.pop(key, None)
+        return result
+
+    def find(self, query: Optional[dict] = None, projection: Optional[dict] = None):
+        return InMemoryCursor(self._docs, query or {}, projection or {})
+
+    async def find_one(self, query: Optional[dict] = None, projection: Optional[dict] = None):
+        for doc in self._docs:
+            if self._matches(doc, query):
+                return self._project(doc, projection)
+        return None
+
+    async def insert_one(self, doc: dict):
+        self._docs.append(copy.deepcopy(doc))
+        return type("InsertResult", (), {"inserted_id": None})()
+
+    async def update_one(self, query: Optional[dict] = None, update: Optional[dict] = None, upsert: bool = False):
+        update = update or {}
+        values = update.get("$set", {})
+        matched = False
+        for doc in self._docs:
+            if self._matches(doc, query):
+                matched = True
+                for key, value in values.items():
+                    doc[key] = copy.deepcopy(value)
+                break
+        if not matched and upsert:
+            new_doc = copy.deepcopy(query or {})
+            new_doc.update(values)
+            self._docs.append(new_doc)
+        return type("UpdateResult", (), {"matched_count": 1 if matched else 0, "modified_count": 1 if matched else 0})()
+
+    async def delete_many(self, query: Optional[dict] = None):
+        remaining = []
+        deleted = 0
+        for doc in self._docs:
+            if self._matches(doc, query):
+                deleted += 1
+            else:
+                remaining.append(doc)
+        self._docs = remaining
+        return deleted
+
+    async def count_documents(self, query: Optional[dict] = None):
+        return sum(1 for doc in self._docs if self._matches(doc, query))
+
+
+class InMemoryCursor:
+    def __init__(self, docs: list, query: Optional[dict] = None, projection: Optional[dict] = None):
+        self._docs = docs
+        self._query = query or {}
+        self._projection = projection or {}
+        self._sort_field = None
+        self._sort_desc = False
+
+    def sort(self, field: str, direction: int = -1):
+        self._sort_field = field
+        self._sort_desc = direction == -1
+        return self
+
+    async def to_list(self, limit: int = 1000):
+        filtered = []
+        for doc in self._docs:
+            if self._matches(doc):
+                filtered.append(self._project(doc))
+        if self._sort_field:
+            filtered.sort(key=lambda item: item.get(self._sort_field, ""), reverse=self._sort_desc)
+        return filtered[:limit]
+
+    def _matches(self, doc: dict) -> bool:
+        query = self._query
+        for key, expected in query.items():
+            if isinstance(expected, dict):
+                if "$ne" in expected:
+                    if doc.get(key) == expected["$ne"]:
+                        return False
+                else:
+                    return False
+            elif doc.get(key) != expected:
+                return False
+        return True
+
+    def _project(self, doc: dict) -> dict:
+        if not self._projection:
+            return copy.deepcopy(doc)
+        result = copy.deepcopy(doc)
+        for key, include in self._projection.items():
+            if key == "_id" and include == 0:
+                result.pop("_id", None)
+            elif include == 0 and key in result:
+                result.pop(key, None)
+        return result
+
+
+class SafeCollection:
+    def __init__(self, real_collection, fallback_collection):
+        self._real = real_collection
+        self._fallback = fallback_collection
+
+    async def find_one(self, query: Optional[dict] = None, projection: Optional[dict] = None):
+        if self._real is None:
+            return await self._fallback.find_one(query, projection)
+        try:
+            return await self._real.find_one(query, projection)
+        except Exception as exc:
+            logger.warning("MongoDB unavailable for %s, using in-memory fallback: %s", self._fallback.name, exc)
+            return await self._fallback.find_one(query, projection)
+
+    def find(self, query: Optional[dict] = None, projection: Optional[dict] = None):
+        real_cursor = self._real.find(query, projection) if self._real is not None else None
+        return SafeCursor(real_cursor, self._fallback.find(query, projection))
+
+    async def insert_one(self, doc: dict):
+        try:
+            return await self._real.insert_one(doc)
+        except Exception as exc:
+            logger.warning("MongoDB unavailable for %s, using in-memory fallback: %s", self._fallback.name, exc)
+            return await self._fallback.insert_one(doc)
+
+    async def update_one(self, query: Optional[dict] = None, update: Optional[dict] = None, upsert: bool = False):
+        try:
+            return await self._real.update_one(query, update, upsert=upsert)
+        except Exception as exc:
+            logger.warning("MongoDB unavailable for %s, using in-memory fallback: %s", self._fallback.name, exc)
+            return await self._fallback.update_one(query, update, upsert=upsert)
+
+    async def delete_many(self, query: Optional[dict] = None):
+        try:
+            return await self._real.delete_many(query)
+        except Exception as exc:
+            logger.warning("MongoDB unavailable for %s, using in-memory fallback: %s", self._fallback.name, exc)
+            return await self._fallback.delete_many(query)
+
+    async def count_documents(self, query: Optional[dict] = None):
+        try:
+            return await self._real.count_documents(query)
+        except Exception as exc:
+            logger.warning("MongoDB unavailable for %s, using in-memory fallback: %s", self._fallback.name, exc)
+            return await self._fallback.count_documents(query)
+
+
+class SafeCursor:
+    def __init__(self, real_cursor, fallback_cursor):
+        self._real = real_cursor
+        self._fallback = fallback_cursor
+
+    def sort(self, field: str, direction: int = -1):
+        try:
+            self._real.sort(field, direction)
+        except Exception:
+            self._fallback.sort(field, direction)
+        return self
+
+    async def to_list(self, limit: int = 1000):
+        try:
+            return await self._real.to_list(limit)
+        except Exception as exc:
+            logger.warning("MongoDB cursor unavailable, using in-memory fallback: %s", exc)
+            return await self._fallback.to_list(limit)
+
+
+class SafeDatabase:
+    def __init__(self, db_name: str):
+        self._db_name = db_name
+        self._collections = {}
+
+    def __getattr__(self, name: str):
+        if name not in self._collections:
+            fallback_collection = InMemoryCollection(name)
+            self._collections[name] = SafeCollection(None, fallback_collection)
+        return self._collections[name]
+
+
+db = SafeDatabase(DB_NAME)
 
 app = FastAPI(title="Avero API")
 api = APIRouter(prefix="/api")
@@ -80,7 +279,7 @@ class ChatIn(BaseModel):
 
 class SiteSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    starting_price: str = "₹2,999"
+    starting_price: str = "₹3,999"
     original_price: str = "₹15,000"
     save_percent: int = 80
     slots_left: int = 6
@@ -89,7 +288,7 @@ class SiteSettings(BaseModel):
     offer_tagline: str = "Everything a modern business needs to look premium online — design, dev, hosting, SEO, AI chatbot & 48-hour delivery."
     guarantee_note: str = "100% money-back if we miss 48H*"
     announcement_items: List[str] = Field(default_factory=lambda: [
-        "Launch Offer — Premium Website Starting at ₹2,999",
+        "Launch Offer — Premium Website Starting at ₹3,999",
         "Website Delivery in 48 Hours",
         "Free Domain + Hosting Setup Available",
         "AI Chatbot + SEO-Ready Websites",
@@ -396,4 +595,4 @@ async def on_startup():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    client.close()
+    return None

@@ -84,7 +84,7 @@ export default function MemeSection() {
                 <div className="spot-glow w-72 h-72 bg-purple-600 top-6 left-1/2" />
                 <div className="spot-glow w-72 h-72 bg-cyan-500 bottom-6 right-6" />
                 <AfterScene />
-                <MemeLabel side="right" tone="cyan" text="Business WITH Avero 🚀" sub="₹2,999 · Live in 48H · Sending leads at 3AM" />
+                <MemeLabel side="right" tone="cyan" text="Business WITH Avero 🚀" sub="₹3,999 · Live in 48H · Sending leads at 3AM" />
               </div>
             </div>
 

@@ -4,7 +4,7 @@ import {
 
 const faqs = [
   { q: "Can you really deliver a website in 48 hours?", a: "Yes, for starter and standard business websites when content and requirements are clear. Advanced sites, ecommerce, admin panels or 3D websites may take a little longer." },
-  { q: "What is included in ₹2,999?", a: "A starter website package with basic responsive design, contact / WhatsApp CTA and essential sections. Final price depends on features you add." },
+  { q: "What is included in ₹3,999?", a: "A starter website package with basic responsive design, contact / WhatsApp CTA and essential sections. Final price depends on features you add." },
   { q: "Do you provide domain and hosting?", a: "Yes — we can help with domain, hosting, SSL, DNS and deployment setup." },
   { q: "Can you add WhatsApp button and enquiry forms?", a: "Every website can include WhatsApp, call, email and enquiry forms out of the box." },
   { q: "Do you make SEO-ready websites?", a: "We build websites with an SEO-friendly structure, metadata, fast loading and local business optimization basics." },
