@@ -1,7 +1,7 @@
 import { getDb } from "./db.js";
 
 export const DEFAULT_SETTINGS = {
-  starting_price: "₹2,999",
+  starting_price: "₹3,999",
   original_price: "₹15,000",
   save_percent: 80,
   slots_left: 6,
@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS = {
   offer_tagline: "Everything a modern business needs to look premium online — design, dev, hosting, SEO, AI chatbot & 48-hour delivery.",
   guarantee_note: "100% money-back if we miss 48H*",
   announcement_items: [
-    "Launch Offer — Premium Website Starting at ₹2,999",
+    "Launch Offer — Premium Website Starting at ₹3,999",
     "Website Delivery in 48 Hours",
     "Free Domain + Hosting Setup Available",
     "AI Chatbot + SEO-Ready Websites",

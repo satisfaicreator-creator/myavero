@@ -9,6 +9,6 @@ export const AVERO = {
   phone: "+91-9680816234",
   phoneRaw: "919680816234",
   whatsapp: "https://wa.me/919680816234",
-  startingPrice: "₹2,999",
+  startingPrice: "₹3,999",
   delivery: "48 Hours",
 };

@@ -8,7 +8,7 @@ BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://growth-hub-380.previ
 API = f"{BASE_URL}/api"
 
 ADMIN_EMAIL = "admin@theavero.dev"
-ADMIN_PASSWORD = "Avero@2999"
+ADMIN_PASSWORD = "Avero@3999"
 
 
 @pytest.fixture(scope="session")
@@ -140,10 +140,10 @@ def test_admin_update_settings_roundtrip(state):
     assert "TEST announcement item" in r3.json()["announcement_items"]
     # restore
     r4 = requests.put(f"{API}/admin/settings",
-                      json={**original, "starting_price": "₹2,999"},
+                      json={**original, "starting_price": "₹3,999"},
                       headers=headers, timeout=15)
     assert r4.status_code == 200
-    assert r4.json()["starting_price"] == "₹2,999"
+    assert r4.json()["starting_price"] == "₹3,999"
 
 
 # -------- Blog --------
@@ -233,7 +233,7 @@ def test_chat_sse_stream():
 
 # -------- Chat rule-based replies --------
 @pytest.mark.parametrize("msg,needle", [
-    ("what is the price?", "2,999"),
+    ("what is the price?", "3,999"),
     ("48 hour delivery?", "48 hours"),
     ("random gibberish here", "9680816234"),
 ])

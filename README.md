@@ -4,7 +4,7 @@ Production-ready full-stack marketing site + admin dashboard + AI chatbot for Av
 
 **Tagline:** We Design. You Grow.
 **Website:** https://theavero.dev
-**Promise:** Website delivery in 48 hours · Starting ₹2,999
+**Promise:** Website delivery in 48 hours · Starting ₹3,999
 
 ## Stack
 - React 19 + Tailwind + Framer Motion + shadcn/ui
@@ -35,7 +35,7 @@ Production-ready full-stack marketing site + admin dashboard + AI chatbot for Av
 
 ## Admin (seeded)
 - Email: `admin@theavero.dev`
-- Password: `Avero@2999`
+- Password: `Avero@3999`
 See `/app/memory/test_credentials.md`.
 
 ## Environment

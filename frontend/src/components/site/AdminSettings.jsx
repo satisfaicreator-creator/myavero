@@ -16,7 +16,7 @@ const SECTION_META = [
   { key: "portfolio",       label: "Portfolio",                desc: "Live demo concepts grid" },
   { key: "threed_showcase", label: "3D Sites Showcase",        desc: "Cinematic 3D examples" },
   { key: "industries",      label: "Industries",               desc: "Salons, CAs, ecommerce…" },
-  { key: "pricing",         label: "Pricing (Mega Offer)",     desc: "₹2,999 offer card" },
+  { key: "pricing",         label: "Pricing (Mega Offer)",     desc: "₹3,999 offer card" },
   { key: "why",             label: "Why Avero",                desc: "Value props / trust badges" },
   { key: "before_after",    label: "Before / After",           desc: "Comparison slider" },
   { key: "lead_gen",        label: "Lead Gen Strip",           desc: "Mid-page conversion nudge" },
@@ -118,7 +118,7 @@ export default function SettingsPanel({ token }) {
           </button>
         </header>
         <div className="grid sm:grid-cols-2 gap-3">
-          <TextField label="Starting Price" testid="field-starting-price" value={form.starting_price} onChange={set("starting_price")} placeholder="₹2,999" />
+          <TextField label="Starting Price" testid="field-starting-price" value={form.starting_price} onChange={set("starting_price")} placeholder="₹3,999" />
           <TextField label="Original Price (strike)" testid="field-original-price" value={form.original_price} onChange={set("original_price")} placeholder="₹15,000" />
           <TextField label="Save %" type="number" testid="field-save-percent" value={form.save_percent} onChange={set("save_percent")} placeholder="80" />
           <TextField label="Slots Left This Week" type="number" testid="field-slots-left" value={form.slots_left} onChange={set("slots_left")} placeholder="6" />

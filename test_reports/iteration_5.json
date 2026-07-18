@@ -13,7 +13,7 @@
   ],
   "updated_files": [],
   "success_rate": {"backend": "100%", "frontend": "100%"},
-  "test_credentials": "admin@theavero.dev / Avero@2999",
+  "test_credentials": "admin@theavero.dev / Avero@3999",
   "seed_data_creation": "None (existing seed retained)",
   "retest_needed": false,
   "should_main_agent_self_test": false,

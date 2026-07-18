@@ -1,5 +1,5 @@
 {
-  "summary": "Iteration 2 full-stack testing of Avero. Backend: 10/10 pytest passing (root health, enquiries CRUD w/ validation, admin JWT login+enquiries+stats+PATCH, chat SSE session/delta/done). Confirmed chat now responds correctly to 'Do you offer AI marketing?' with 'AI marketing services are coming soon at Avero' — new positioning is honored in system prompt. Frontend: all new sections render on desktop (1920) and mobile (390) — MemeSection (compare stage + slider handle + 3 presets + 3 story beats + 2 CTAs), Laptop3D (scene/screen/tabs/prev/next, all 3 tab contents cycle), single mega-offer Pricing card (₹15,000 struck-through + ₹2,999 + 14 features + 2 CTAs), Roadmap (4 items + CTA). Hero subheadline updated to 'Avero is a modern IT studio'. Portfolio cards render (mshots URLs load, no image crashes).",
+  "summary": "Iteration 2 full-stack testing of Avero. Backend: 10/10 pytest passing (root health, enquiries CRUD w/ validation, admin JWT login+enquiries+stats+PATCH, chat SSE session/delta/done). Confirmed chat now responds correctly to 'Do you offer AI marketing?' with 'AI marketing services are coming soon at Avero' — new positioning is honored in system prompt. Frontend: all new sections render on desktop (1920) and mobile (390) — MemeSection (compare stage + slider handle + 3 presets + 3 story beats + 2 CTAs), Laptop3D (scene/screen/tabs/prev/next, all 3 tab contents cycle), single mega-offer Pricing card (₹15,000 struck-through + ₹3,999 + 14 features + 2 CTAs), Roadmap (4 items + CTA). Hero subheadline updated to 'Avero is a modern IT studio'. Portfolio cards render (mshots URLs load, no image crashes).",
   "backend_issues": {"critical": [], "minor": []},
   "frontend_issues": {
     "ui_bugs": [
@@ -19,7 +19,7 @@
   ],
   "updated_files": [],
   "success_rate": {"backend": "100%", "frontend": "100%"},
-  "test_credentials": "admin@theavero.dev / Avero@2999 (seeded)",
+  "test_credentials": "admin@theavero.dev / Avero@3999 (seeded)",
   "seed_data_creation": "1 TEST_ enquiry created via test_create_enquiry_full_payload (patched to status=contacted).",
   "retest_needed": false,
   "main_agent_can_self_test": true,

@@ -6,6 +6,10 @@
   "outputDirectory": "frontend/build",
   "trailingSlash": false,
   "rewrites": [
+    {
+      "source": "/products/35l-pipeline/:path*",
+      "destination": "https://35l-pipeline.vercel.app/:path*"
+    },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

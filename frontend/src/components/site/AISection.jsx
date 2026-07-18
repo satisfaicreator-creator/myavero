@@ -36,7 +36,7 @@ export default function AISection() {
                 Salon in Jaipur — need bookings + gallery.
               </div>
               <div className="rounded-2xl rounded-tl-none bg-white/5 border border-white/10 px-3 py-2 text-sm text-white/85 max-w-[85%]">
-                Perfect! Starter plan at ₹2,999 fits. Want me to send a demo + WhatsApp our team?
+                Perfect! Starter plan at ₹3,999 fits. Want me to send a demo + WhatsApp our team?
               </div>
               <div className="flex gap-2 mt-3">
                 <button className="btn-glow text-xs px-3 py-1.5 rounded-full">Yes, WhatsApp me</button>

@@ -1,8 +1,8 @@
 """Rule-based responder for Avero chatbot. Zero external API cost."""
 
 RULES = [
-    (["price", "cost", "pricing", "2999", "₹2,999", "how much", "kitna", "kharcha"],
-     "Our Mega Launch Offer starts at ₹2,999 — everything included: design, development, hosting setup, SSL, SEO, chatbot, WhatsApp CTAs, enquiry forms, 1-month maintenance and 48-hour delivery. Final cost depends on pages, ecommerce, 3D or admin panel needs. Want a quick quote? WhatsApp us on +91-9680816234 with your business type."),
+    (["price", "cost", "pricing", "3999", "₹3,999", "how much", "kitna", "kharcha"],
+     "Our Mega Launch Offer starts at ₹3,999 — everything included: design, development, hosting setup, SSL, SEO, chatbot, WhatsApp CTAs, enquiry forms, 1-month maintenance and 48-hour delivery. Final cost depends on pages, ecommerce, 3D or admin panel needs. Want a quick quote? WhatsApp us on +91-9680816234 with your business type."),
     (["48", "hour", "delivery", "fast", "quick", "jaldi", "turnaround"],
      "Yes — 48 hours is our flagship promise for standard business websites when your content and requirements are clear from day one. Ecommerce, admin panels or 3D websites may need a little longer. Want to start the clock today? WhatsApp us on +91-9680816234."),
     (["seo", "google", "rank", "ranking", "search"],

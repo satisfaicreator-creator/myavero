@@ -30,7 +30,7 @@ export default function Landing() {
   const on = (k) => s[k] !== false;
 
   useEffect(() => {
-    document.title = "Avero | Premium Websites in 48 Hours · Starting ₹2,999";
+    document.title = "Avero | Premium Websites in 48 Hours · Starting ₹3,999";
     const setMeta = (name, content) => {
       let el = document.querySelector(`meta[name="${name}"]`);
       if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
@@ -57,9 +57,9 @@ export default function Landing() {
       s.text = JSON.stringify(data);
     };
 
-    setMeta("description", "Avero is a modern IT studio delivering premium AI-powered websites in 48 hours (starting ₹2,999) — with AI marketing, advertising, model fine-tuning and trainings on the roadmap.");
+    setMeta("description", "Avero is a modern IT studio delivering premium AI-powered websites in 48 hours (starting ₹3,999) — with AI marketing, advertising, model fine-tuning and trainings on the roadmap.");
     setMeta("keywords", "website development India, business website, 48 hour website delivery, AI chatbot website, AI marketing agency, AI advertisement, model fine-tuning, IT solutions India, premium website design, Avero, theavero.dev");
-    setProp("og:title", "Avero | Premium Websites in 48 Hours · Starting ₹2,999");
+    setProp("og:title", "Avero | Premium Websites in 48 Hours · Starting ₹3,999");
     setProp("og:description", "Modern IT studio delivering premium AI-powered websites in 48 hours. AI marketing, ads & model fine-tuning coming soon.");
     setProp("og:url", "https://theavero.dev/");
     upsertLink("canonical", "https://theavero.dev/");
@@ -106,7 +106,7 @@ export default function Landing() {
       "offers": {
         "@type": "Offer",
         "name": "Complete Business Website Package",
-        "price": "2999",
+        "price": "3999",
         "priceCurrency": "INR",
         "priceValidUntil": "2027-12-31",
         "availability": "https://schema.org/InStock",
@@ -125,7 +125,7 @@ export default function Landing() {
       "@type": "FAQPage",
       "mainEntity": [
         { "@type": "Question", "name": "Can you really deliver a website in 48 hours?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — for starter and standard business websites when content and requirements are clear. Advanced sites, ecommerce, admin panels or 3D websites may take a little longer." } },
-        { "@type": "Question", "name": "What is included in ₹2,999?", "acceptedAnswer": { "@type": "Answer", "text": "A starter website package with responsive design, contact/WhatsApp CTAs and essential sections. Final price depends on features you add." } },
+        { "@type": "Question", "name": "What is included in ₹3,999?", "acceptedAnswer": { "@type": "Answer", "text": "A starter website package with responsive design, contact/WhatsApp CTAs and essential sections. Final price depends on features you add." } },
         { "@type": "Question", "name": "Do you provide domain and hosting?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — we can help with domain, hosting, SSL, DNS and deployment setup." } },
         { "@type": "Question", "name": "Do you make SEO-ready websites?", "acceptedAnswer": { "@type": "Answer", "text": "We build websites with SEO-friendly structure, metadata, fast loading and local SEO basics." } },
         { "@type": "Question", "name": "Can you build a 3D website?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — we create interactive Three.js sites, 3D product sections, scroll animations and cinematic landing pages." } }

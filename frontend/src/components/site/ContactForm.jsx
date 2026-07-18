@@ -11,7 +11,7 @@ const websiteTypes = [
   "Business Website", "Landing Page", "Ecommerce Website",
   "Portfolio Website", "3D Website", "Website Redesign", "AI Chatbot", "Other"
 ];
-const budgets = ["₹2,999 Starter", "₹5,000 - ₹10,000", "₹10,000 - ₹25,000", "Premium Custom"];
+const budgets = ["₹3,999 Starter", "₹5,000 - ₹10,000", "₹10,000 - ₹25,000", "Premium Custom"];
 const timelines = ["Urgent / 48 Hours", "This Week", "This Month", "Not Sure"];
 
 const initial = {
