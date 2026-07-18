@@ -1,8 +1,12 @@
 """Backend API tests for Avero"""
 import os
 import json
+import sys
+from pathlib import Path
 import pytest
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://growth-hub-380.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
@@ -105,6 +109,30 @@ def test_admin_patch_enquiry_status(state):
 
 
 # -------- Settings --------
+def test_featured_products_toggle_exists_in_backend_defaults():
+    from server import SiteSettings
+
+    settings = SiteSettings()
+    assert "featured_products" in settings.sections
+    assert settings.sections["featured_products"] is True
+
+
+def test_hero_toggle_exists_in_backend_defaults():
+    from server import SiteSettings
+
+    settings = SiteSettings()
+    assert "hero" in settings.sections
+    assert settings.sections["hero"] is True
+
+
+def test_section_order_exists_in_backend_defaults():
+    from server import SiteSettings
+
+    settings = SiteSettings()
+    assert "section_order" in settings.model_fields
+    assert settings.section_order[0] == "announcement"
+
+
 def test_public_settings_no_auth():
     r = requests.get(f"{API}/settings", timeout=15)
     assert r.status_code == 200

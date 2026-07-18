@@ -19,6 +19,7 @@ import Roadmap from "@/components/site/Roadmap";
 import BlogSection from "@/components/site/BlogSection";
 import ContactForm from "@/components/site/ContactForm";
 import FAQ from "@/components/site/FAQ";
+import FeaturedProducts from "@/components/site/FeaturedProducts";
 import Footer from "@/components/site/Footer";
 import MobileCTA from "@/components/site/MobileCTA";
 import Chatbot from "@/components/site/Chatbot";
@@ -27,7 +28,11 @@ import { useSettings } from "@/lib/settings";
 export default function Landing() {
   const { settings } = useSettings();
   const s = settings.sections || {};
+  const order = Array.isArray(settings.section_order) && settings.section_order.length
+    ? settings.section_order.filter((key) => key && typeof key === "string")
+    : ["announcement", "hero", "meme", "problem", "services", "laptop3d", "delivery", "portfolio", "threed_showcase", "industries", "pricing", "featured_products", "why", "before_after", "lead_gen", "ai", "roadmap", "blog", "faq", "chatbot", "mobile_cta"];
   const on = (k) => s[k] !== false;
+  const visibleSections = order.filter((key) => on(key));
 
   useEffect(() => {
     document.title = "Avero | Premium Websites in 48 Hours · Starting ₹3,999";
@@ -175,33 +180,43 @@ export default function Landing() {
     });
   }, []);
 
+  const sectionComponents = {
+    announcement: <AnnouncementBar key="announcement" />,
+    hero: <Hero key="hero" />,
+    meme: <MemeSection key="meme" />,
+    problem: <ProblemSection key="problem" />,
+    services: <Services key="services" />,
+    laptop3d: <Laptop3D key="laptop3d" />,
+    delivery: <Delivery key="delivery" />,
+    portfolio: <Portfolio key="portfolio" />,
+    threed_showcase: <ThreeDShowcase key="threed_showcase" />,
+    industries: <Industries key="industries" />,
+    pricing: <Pricing key="pricing" />,
+    featured_products: <FeaturedProducts key="featured_products" />,
+    why: <WhyAvero key="why" />,
+    before_after: <BeforeAfter key="before_after" />,
+    lead_gen: <LeadGen key="lead_gen" />,
+    ai: <AISection key="ai" />,
+    roadmap: <Roadmap key="roadmap" />,
+    blog: <BlogSection key="blog" />,
+    faq: <FAQ key="faq" />,
+    chatbot: <Chatbot key="chatbot" />,
+    mobile_cta: <MobileCTA key="mobile_cta" />,
+  };
+
+  const visible = visibleSections.filter((key) => key !== "chatbot" && key !== "mobile_cta");
+
   return (
     <div className="min-h-screen text-white overflow-x-hidden" data-testid="landing-page">
-      {on("announcement") && <AnnouncementBar />}
+      {on("announcement") && sectionComponents.announcement}
       <Header />
       <main>
-        <Hero />
-        {on("meme") && <MemeSection />}
-        {on("problem") && <ProblemSection />}
-        {on("services") && <Services />}
-        {on("laptop3d") && <Laptop3D />}
-        {on("delivery") && <Delivery />}
-        {on("portfolio") && <Portfolio />}
-        {on("threed_showcase") && <ThreeDShowcase />}
-        {on("industries") && <Industries />}
-        {on("pricing") && <Pricing />}
-        {on("why") && <WhyAvero />}
-        {on("before_after") && <BeforeAfter />}
-        {on("lead_gen") && <LeadGen />}
-        {on("ai") && <AISection />}
-        {on("roadmap") && <Roadmap />}
-        {on("blog") && <BlogSection />}
+        {visible.map((key) => sectionComponents[key])}
         <ContactForm />
-        {on("faq") && <FAQ />}
       </main>
       <Footer />
-      {on("mobile_cta") && <MobileCTA />}
-      {on("chatbot") && <Chatbot />}
+      {on("mobile_cta") && sectionComponents.mobile_cta}
+      {on("chatbot") && sectionComponents.chatbot}
     </div>
   );
 }

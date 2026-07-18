@@ -25,14 +25,14 @@ from responder import match_reply
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-MONGO_URL = os.environ["MONGO_URL"]
-DB_NAME = os.environ["DB_NAME"]
-JWT_SECRET = os.environ.get("JWT_SECRET", "change_me")
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "avero_dev")
+JWT_SECRET = os.environ.get("JWT_SECRET", "dev-secret")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 ADMIN_RECIPIENT_EMAIL = os.environ.get("ADMIN_RECIPIENT_EMAIL", "")
-ADMIN_EMAIL_DEFAULT = os.environ.get("ADMIN_EMAIL", "")
-ADMIN_PASSWORD_DEFAULT = os.environ.get("ADMIN_PASSWORD", "")
+ADMIN_EMAIL_DEFAULT = os.environ.get("ADMIN_EMAIL", "admin@theavero.dev")
+ADMIN_PASSWORD_DEFAULT = os.environ.get("ADMIN_PASSWORD", "Avero@2999")
 
 resend.api_key = RESEND_API_KEY
 
@@ -312,6 +312,7 @@ class SiteSettings(BaseModel):
     ])
     sections: Dict[str, bool] = Field(default_factory=lambda: {
         "announcement": True,
+        "hero": True,
         "meme": True,
         "problem": True,
         "services": True,
@@ -321,6 +322,7 @@ class SiteSettings(BaseModel):
         "threed_showcase": True,
         "industries": True,
         "pricing": True,
+        "featured_products": True,
         "why": True,
         "before_after": True,
         "lead_gen": True,
@@ -331,6 +333,29 @@ class SiteSettings(BaseModel):
         "chatbot": True,
         "mobile_cta": True,
     })
+    section_order: List[str] = Field(default_factory=lambda: [
+        "announcement",
+        "hero",
+        "meme",
+        "problem",
+        "services",
+        "laptop3d",
+        "delivery",
+        "portfolio",
+        "threed_showcase",
+        "industries",
+        "pricing",
+        "featured_products",
+        "why",
+        "before_after",
+        "lead_gen",
+        "ai",
+        "roadmap",
+        "blog",
+        "faq",
+        "chatbot",
+        "mobile_cta",
+    ])
 
 
 # ---------------- Auth ----------------
